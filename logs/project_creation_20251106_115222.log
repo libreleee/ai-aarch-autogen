@@ -1,0 +1,28 @@
+[2025-11-06 11:52:22] INFO: 📄 Log file: logs\project_creation_20251106_115222.log
+[2025-11-06 11:52:22] DEBUG: Using proactor: IocpProactor
+[2025-11-06 11:52:22] INFO: ================================================================================
+[2025-11-06 11:52:22] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 11:52:22] INFO: ================================================================================
+[2025-11-06 11:52:22] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 11:52:22] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 11:52:22] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 11:52:22] DEBUG: Created directory: workspace\test_results
+[2025-11-06 11:52:22] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 11:52:22] DEBUG: Created directory: logs
+[2025-11-06 11:52:22] INFO: ✓ Bridge workspace initialized
+[2025-11-06 11:52:24] INFO: Selected platforms: ['agno']
+[2025-11-06 11:52:30] INFO: Project name: tcp-autogen
+[2025-11-06 11:52:30] INFO: Base location: D:\work\projects\new
+[2025-11-06 11:52:30] INFO: Timestamp: 20251106_115230
+[2025-11-06 11:52:30] INFO: Created project directory: D:\work\projects\new\tcp-autogen-20251106_115230
+[2025-11-06 11:52:30] INFO: Created docs directory: D:\work\projects\new\tcp-autogen-20251106_115230\docs
+[2025-11-06 11:52:30] INFO: Created requirements directory: D:\work\projects\new\tcp-autogen-20251106_115230\docs\01-requirements
+[2025-11-06 11:53:04] INFO: Starting Phase 1: DESIGN
+[2025-11-06 11:53:16] INFO: Design document saved: D:\work\projects\new\tcp-autogen-20251106_115230\DESIGN.md
+[2025-11-06 11:53:55] ERROR: AGNO workflow failed: [WinError 123] 파일 이름, 디렉터리 이름 또는 볼륨 레이블 구문이 잘못되었습니다: 'D:\\work\\projects\\new\\tcp-autogen-20251106_115230\\Okay, I will generate the test code for the `tcp-autogen` project as requested, aiming for at least 80% test coverage using `pytest`.  Based on the provided requirements and the assumption that the project will consist of a client and server application capable of communicating over TCP, I will create `tests'
+[2025-11-06 11:53:55] INFO: ================================================================================
+[2025-11-06 11:53:55] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 11:53:55] INFO: ================================================================================
+[2025-11-06 11:53:55] INFO: Location: D:\work\projects\new
+[2025-11-06 11:53:55] INFO: Project: D:\work\projects\new\tcp-autogen-20251106_115230
+[2025-11-06 11:53:55] INFO: Session completed successfully

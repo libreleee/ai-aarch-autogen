@@ -1,0 +1,82 @@
+[2025-11-06 13:50:47] INFO: 📄 Log file: logs\project_creation_20251106_135047.log
+[2025-11-06 13:50:47] INFO: EXECUTION_MODE: cli
+[2025-11-06 13:50:47] INFO: API_PROVIDER: gemini
+[2025-11-06 13:50:47] INFO: CLI_PROVIDER: claude-cli
+[2025-11-06 13:50:47] DEBUG: Using proactor: IocpProactor
+[2025-11-06 13:50:47] INFO: ================================================================================
+[2025-11-06 13:50:47] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 13:50:47] INFO: ================================================================================
+[2025-11-06 13:50:48] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 13:50:48] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 13:50:48] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 13:50:48] DEBUG: Created directory: workspace\test_results
+[2025-11-06 13:50:48] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 13:50:48] DEBUG: Created directory: logs
+[2025-11-06 13:50:48] INFO: ✓ Bridge workspace initialized
+[2025-11-06 13:50:49] INFO: Selected platforms: ['agno']
+[2025-11-06 13:50:55] INFO: Project name: tcp-summer
+[2025-11-06 13:50:55] INFO: Base location: D:\work\projects\new
+[2025-11-06 13:50:55] INFO: Timestamp: 20251106_135055
+[2025-11-06 13:50:55] INFO: Created project directory: D:\work\projects\new\tcp-summer-20251106_135055
+[2025-11-06 13:50:55] INFO: Created docs directory: D:\work\projects\new\tcp-summer-20251106_135055\docs
+[2025-11-06 13:50:55] INFO: Created requirements directory: D:\work\projects\new\tcp-summer-20251106_135055\docs\01-requirements
+[2025-11-06 13:51:07] INFO: CLI Mode: claude-cli (model: haiku)
+[2025-11-06 13:51:07] INFO: Starting Phase 0: COST ESTIMATION
+[2025-11-06 13:51:07] INFO: Starting Phase 1: DESIGN
+[2025-11-06 13:51:07] INFO: [claude-cli] prompt=1240chars
+[2025-11-06 13:51:07] INFO: [claude-cli] executing: claude -p @C:\Users\i\AppData\Local\Temp\tmpnbinpi3l.txt --model haiku
+[2025-11-06 13:51:07] ERROR: [claude-cli] claude command not found
+[2025-11-06 13:51:07] ERROR: Exception details:
+Traceback (most recent call last):
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 496, in _generate_content_claude_cli
+    result = subprocess.run(
+        cmd,
+    ...<4 lines>...
+        cwd=os.getcwd()  # 현재 작업 디렉토리 유지
+    )
+  File "C:\Users\i\AppData\Roaming\uv\python\cpython-3.13.9-windows-x86_64-none\Lib\subprocess.py", line 554, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\i\AppData\Roaming\uv\python\cpython-3.13.9-windows-x86_64-none\Lib\subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\i\AppData\Roaming\uv\python\cpython-3.13.9-windows-x86_64-none\Lib\subprocess.py", line 1554, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                             # no special security
+                             ^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                             cwd,
+                             ^^^^
+                             startupinfo)
+                             ^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] 지정된 파일을 찾을 수 없습니다
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 1919, in run_actor_critic_workflow
+    design_result = await team.design_phase()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 715, in design_phase
+    response = self._generate_content(design_prompt)
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 242, in _generate_content
+    response_text = self._generate_content_claude_cli(prompt)
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 530, in _generate_content_claude_cli
+    raise RuntimeError("Claude CLI not installed or not in PATH")
+RuntimeError: Claude CLI not installed or not in PATH
+
+[2025-11-06 13:51:07] ERROR: AGNO workflow failed: Claude CLI not installed or not in PATH
+[2025-11-06 13:51:07] INFO: ================================================================================
+[2025-11-06 13:51:07] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 13:51:07] INFO: ================================================================================
+[2025-11-06 13:51:07] INFO: Location: D:\work\projects\new
+[2025-11-06 13:51:07] INFO: Project: D:\work\projects\new\tcp-summer-20251106_135055
+[2025-11-06 13:51:07] INFO: Session completed successfully

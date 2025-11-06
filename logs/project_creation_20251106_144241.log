@@ -1,0 +1,96 @@
+[2025-11-06 14:42:41] INFO: 📄 Log file: logs\project_creation_20251106_144241.log
+[2025-11-06 14:42:41] INFO: EXECUTION_MODE: cli
+[2025-11-06 14:42:41] INFO: API_PROVIDER: gemini
+[2025-11-06 14:42:41] INFO: CLI_PROVIDER: copilot-cli
+[2025-11-06 14:42:41] DEBUG: Using proactor: IocpProactor
+[2025-11-06 14:42:41] INFO: ================================================================================
+[2025-11-06 14:42:41] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 14:42:41] INFO: ================================================================================
+[2025-11-06 14:42:41] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 14:42:41] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 14:42:41] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 14:42:41] DEBUG: Created directory: workspace\test_results
+[2025-11-06 14:42:41] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 14:42:41] DEBUG: Created directory: logs
+[2025-11-06 14:42:41] INFO: ✓ Bridge workspace initialized
+[2025-11-06 14:42:44] INFO: Selected platforms: ['agno']
+[2025-11-06 14:42:53] INFO: Project name: tcp_autogen
+[2025-11-06 14:42:53] INFO: Base location: D:\work\projects\new
+[2025-11-06 14:42:53] INFO: Timestamp: 20251106_144253
+[2025-11-06 14:42:53] INFO: Created project directory: D:\work\projects\new\tcp_autogen-20251106_144253
+[2025-11-06 14:42:53] INFO: Created docs directory: D:\work\projects\new\tcp_autogen-20251106_144253\docs
+[2025-11-06 14:42:53] INFO: Created requirements directory: D:\work\projects\new\tcp_autogen-20251106_144253\docs\01-requirements
+[2025-11-06 14:43:13] INFO: CLI Mode: copilot-cli (model: claude-haiku-4.5)
+[2025-11-06 14:43:13] INFO: Starting Phase 0: COST ESTIMATION
+[2025-11-06 14:43:13] INFO: Starting Phase 1: DESIGN
+[2025-11-06 14:43:13] INFO: [copilot-cli] prompt=1243chars
+[2025-11-06 14:43:49] INFO: [copilot-cli] return_code=0
+[2025-11-06 14:43:49] INFO: [copilot-cli] stdout_len=4817
+[2025-11-06 14:43:49] INFO: [copilot-cli] success: 4815 chars
+[2025-11-06 14:43:49] INFO: Design draft saved: D:\work\projects\new\tcp_autogen-20251106_144253\DESIGN_DRAFT.md
+[2025-11-06 14:43:49] INFO: [copilot-cli] prompt=505chars
+[2025-11-06 14:43:58] INFO: [copilot-cli] return_code=0
+[2025-11-06 14:43:58] INFO: [copilot-cli] stdout_len=322
+[2025-11-06 14:43:58] INFO: [copilot-cli] success: 320 chars
+[2025-11-06 14:47:24] INFO: Cost estimate saved: D:\work\projects\new\tcp_autogen-20251106_144253\docs\03-rfp\ESTIMATE.md
+[2025-11-06 14:47:24] INFO: [copilot-cli] prompt=973chars
+[2025-11-06 14:47:41] INFO: [copilot-cli] return_code=0
+[2025-11-06 14:47:41] INFO: [copilot-cli] stdout_len=2331
+[2025-11-06 14:47:41] INFO: [copilot-cli] success: 2329 chars
+[2025-11-06 14:47:41] INFO: [copilot-cli] prompt=1082chars
+[2025-11-06 14:47:49] INFO: [copilot-cli] return_code=0
+[2025-11-06 14:47:49] INFO: [copilot-cli] stdout_len=116
+[2025-11-06 14:47:49] INFO: [copilot-cli] success: 114 chars
+[2025-11-06 14:47:49] INFO: Implementing server.py, prompt has Korean: True, length: 6160
+[2025-11-06 14:47:49] INFO: [copilot-cli] prompt=6160chars
+[2025-11-06 14:47:50] INFO: [copilot-cli] return_code=1
+[2025-11-06 14:47:50] INFO: [copilot-cli] stdout_len=0
+[2025-11-06 14:47:50] ERROR: [copilot-cli] error: error: too many arguments. Expected 0 arguments but got 5.
+
+Try 'copilot --help' for more information.
+
+[2025-11-06 14:47:50] ERROR: [copilot-cli] exception: Copilot CLI failed: error: too many arguments. Expected 0 arguments but got 5.
+
+Try 'copilot --help' for more information.
+
+[2025-11-06 14:47:50] INFO: Implementing client.py, prompt has Korean: True, length: 6163
+[2025-11-06 14:47:50] INFO: [copilot-cli] prompt=6163chars
+[2025-11-06 14:47:51] INFO: [copilot-cli] return_code=1
+[2025-11-06 14:47:51] INFO: [copilot-cli] stdout_len=0
+[2025-11-06 14:47:51] ERROR: [copilot-cli] error: error: too many arguments. Expected 0 arguments but got 5.
+
+Try 'copilot --help' for more information.
+
+[2025-11-06 14:47:51] ERROR: [copilot-cli] exception: Copilot CLI failed: error: too many arguments. Expected 0 arguments but got 5.
+
+Try 'copilot --help' for more information.
+
+[2025-11-06 14:47:51] INFO: [copilot-cli] prompt=1741chars
+[2025-11-06 14:48:32] INFO: [copilot-cli] return_code=0
+[2025-11-06 14:48:32] INFO: [copilot-cli] stdout_len=20451
+[2025-11-06 14:48:32] INFO: [copilot-cli] success: 20449 chars
+[2025-11-06 14:48:32] INFO: [copilot-cli] prompt=1741chars
+[2025-11-06 14:49:32] INFO: [copilot-cli] return_code=0
+[2025-11-06 14:49:32] INFO: [copilot-cli] stdout_len=21645
+[2025-11-06 14:49:32] INFO: [copilot-cli] success: 21643 chars
+[2025-11-06 14:49:32] ERROR: File generation error: Copilot CLI failed: error: too many arguments. Expected 0 arguments but got 5.
+
+Try 'copilot --help' for more information.
+
+[2025-11-06 14:49:32] ERROR: File generation error: Copilot CLI failed: error: too many arguments. Expected 0 arguments but got 5.
+
+Try 'copilot --help' for more information.
+
+[2025-11-06 14:49:32] INFO: Project metrics saved: D:\work\projects\new\tcp_autogen-20251106_144253\docs\06-delivery\PROJECT_METRICS.md
+[2025-11-06 14:49:32] INFO: AGNO workflow completed successfully
+[2025-11-06 14:49:32] INFO:   Elapsed time: 381.35s
+[2025-11-06 14:49:32] INFO:   Files created: []
+[2025-11-06 14:49:32] INFO:   Design iterations: 1
+[2025-11-06 14:49:32] INFO:   Code iterations: 1
+[2025-11-06 14:49:32] INFO:   Coverage: 85%
+[2025-11-06 14:49:32] INFO: ================================================================================
+[2025-11-06 14:49:32] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 14:49:32] INFO: ================================================================================
+[2025-11-06 14:49:32] INFO: Location: D:\work\projects\new
+[2025-11-06 14:49:32] INFO: Project: D:\work\projects\new\tcp_autogen-20251106_144253
+[2025-11-06 14:49:32] INFO: Session completed successfully

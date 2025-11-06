@@ -1,0 +1,36 @@
+[2025-11-06 12:00:59] INFO: 📄 Log file: logs\project_creation_20251106_120059.log
+[2025-11-06 12:00:59] INFO: EXECUTION_MODE: cli
+[2025-11-06 12:00:59] INFO: API_PROVIDER: gemini
+[2025-11-06 12:00:59] INFO: CLI_PROVIDER: claude-cli
+[2025-11-06 12:00:59] DEBUG: Using proactor: IocpProactor
+[2025-11-06 12:00:59] INFO: ================================================================================
+[2025-11-06 12:00:59] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 12:00:59] INFO: ================================================================================
+[2025-11-06 12:00:59] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 12:00:59] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 12:00:59] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 12:00:59] DEBUG: Created directory: workspace\test_results
+[2025-11-06 12:00:59] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 12:00:59] DEBUG: Created directory: logs
+[2025-11-06 12:00:59] INFO: ✓ Bridge workspace initialized
+[2025-11-06 12:01:01] INFO: Selected platforms: ['agno']
+[2025-11-06 12:01:11] INFO: Project name: tcp-autogen
+[2025-11-06 12:01:11] INFO: Base location: D:\work\projects\new
+[2025-11-06 12:01:11] INFO: Timestamp: 20251106_120111
+[2025-11-06 12:01:11] INFO: Created project directory: D:\work\projects\new\tcp-autogen-20251106_120111
+[2025-11-06 12:01:11] INFO: Created docs directory: D:\work\projects\new\tcp-autogen-20251106_120111\docs
+[2025-11-06 12:01:11] INFO: Created requirements directory: D:\work\projects\new\tcp-autogen-20251106_120111\docs\01-requirements
+[2025-11-06 12:01:27] INFO: Starting Phase 1: DESIGN
+[2025-11-06 12:01:41] INFO: Design document saved: D:\work\projects\new\tcp-autogen-20251106_120111\DESIGN.md
+[2025-11-06 12:02:14] INFO: AGNO workflow completed successfully
+[2025-11-06 12:02:14] INFO:   Elapsed time: 46.16s
+[2025-11-06 12:02:14] INFO:   Files created: ['server.py', 'client.py']
+[2025-11-06 12:02:14] INFO:   Design iterations: 1
+[2025-11-06 12:02:14] INFO:   Code iterations: 1
+[2025-11-06 12:02:14] INFO:   Coverage: 85%
+[2025-11-06 12:02:14] INFO: ================================================================================
+[2025-11-06 12:02:14] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 12:02:14] INFO: ================================================================================
+[2025-11-06 12:02:14] INFO: Location: D:\work\projects\new
+[2025-11-06 12:02:14] INFO: Project: D:\work\projects\new\tcp-autogen-20251106_120111
+[2025-11-06 12:02:14] INFO: Session completed successfully

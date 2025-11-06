@@ -1,0 +1,36 @@
+[2025-11-06 13:39:42] INFO: 📄 Log file: logs\project_creation_20251106_133942.log
+[2025-11-06 13:39:42] INFO: EXECUTION_MODE: cli
+[2025-11-06 13:39:42] INFO: API_PROVIDER: gemini
+[2025-11-06 13:39:42] INFO: CLI_PROVIDER: claude-cli
+[2025-11-06 13:39:42] DEBUG: Using proactor: IocpProactor
+[2025-11-06 13:39:42] INFO: ================================================================================
+[2025-11-06 13:39:42] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 13:39:42] INFO: ================================================================================
+[2025-11-06 13:39:42] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 13:39:42] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 13:39:42] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 13:39:42] DEBUG: Created directory: workspace\test_results
+[2025-11-06 13:39:42] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 13:39:42] DEBUG: Created directory: logs
+[2025-11-06 13:39:42] INFO: ✓ Bridge workspace initialized
+[2025-11-06 13:39:44] INFO: Selected platforms: ['agno']
+[2025-11-06 13:39:51] INFO: Project name: tcp-claude
+[2025-11-06 13:39:51] INFO: Base location: D:\work\projects\new
+[2025-11-06 13:39:51] INFO: Timestamp: 20251106_133951
+[2025-11-06 13:39:51] INFO: Created project directory: D:\work\projects\new\tcp-claude-20251106_133951
+[2025-11-06 13:39:51] INFO: Created docs directory: D:\work\projects\new\tcp-claude-20251106_133951\docs
+[2025-11-06 13:39:51] INFO: Created requirements directory: D:\work\projects\new\tcp-claude-20251106_133951\docs\01-requirements
+[2025-11-06 13:40:19] INFO: Starting Phase 1: DESIGN
+[2025-11-06 13:40:19] INFO: Design document saved: D:\work\projects\new\tcp-claude-20251106_133951\DESIGN.md
+[2025-11-06 13:40:19] INFO: AGNO workflow completed successfully
+[2025-11-06 13:40:19] INFO:   Elapsed time: 0.01s
+[2025-11-06 13:40:19] INFO:   Files created: ['server.py', 'client.py']
+[2025-11-06 13:40:19] INFO:   Design iterations: 1
+[2025-11-06 13:40:19] INFO:   Code iterations: 1
+[2025-11-06 13:40:19] INFO:   Coverage: 85%
+[2025-11-06 13:40:19] INFO: ================================================================================
+[2025-11-06 13:40:19] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 13:40:19] INFO: ================================================================================
+[2025-11-06 13:40:19] INFO: Location: D:\work\projects\new
+[2025-11-06 13:40:19] INFO: Project: D:\work\projects\new\tcp-claude-20251106_133951
+[2025-11-06 13:40:19] INFO: Session completed successfully

@@ -1,0 +1,6 @@
+2025-11-06 17:43:45,553 - __main__ - INFO - Starting TCP Worker Agent Server...
+2025-11-06 17:43:45,554 - TCPOrchestrator - INFO - Starting TCP Orchestrator on localhost:8888 with 4 workers
+2025-11-06 17:43:45,564 - TCPOrchestrator - INFO - TCP Orchestrator started successfully
+2025-11-06 17:44:02,520 - TCPOrchestrator - INFO - Shutting down TCP Orchestrator...
+2025-11-06 17:44:02,520 - TCPOrchestrator - INFO - TCP Orchestrator shutdown complete
+2025-11-06 17:44:02,520 - __main__ - INFO - Server shutdown complete

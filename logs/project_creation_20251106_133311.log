@@ -1,0 +1,31 @@
+[2025-11-06 13:33:11] INFO: 📄 Log file: logs\project_creation_20251106_133311.log
+[2025-11-06 13:33:11] INFO: EXECUTION_MODE: cli
+[2025-11-06 13:33:11] INFO: API_PROVIDER: gemini
+[2025-11-06 13:33:11] INFO: CLI_PROVIDER: claude-cli
+[2025-11-06 13:33:11] DEBUG: Using proactor: IocpProactor
+[2025-11-06 13:33:11] INFO: ================================================================================
+[2025-11-06 13:33:11] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 13:33:11] INFO: ================================================================================
+[2025-11-06 13:33:11] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 13:33:11] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 13:33:11] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 13:33:11] DEBUG: Created directory: workspace\test_results
+[2025-11-06 13:33:11] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 13:33:11] DEBUG: Created directory: logs
+[2025-11-06 13:33:11] INFO: ✓ Bridge workspace initialized
+[2025-11-06 13:33:12] INFO: Selected platforms: ['agno']
+[2025-11-06 13:33:18] INFO: Project name: tcp-claude
+[2025-11-06 13:33:18] INFO: Base location: D:\work\projects\new
+[2025-11-06 13:33:18] INFO: Timestamp: 20251106_133318
+[2025-11-06 13:33:18] INFO: Created project directory: D:\work\projects\new\tcp-claude-20251106_133318
+[2025-11-06 13:33:18] INFO: Created docs directory: D:\work\projects\new\tcp-claude-20251106_133318\docs
+[2025-11-06 13:33:18] INFO: Created requirements directory: D:\work\projects\new\tcp-claude-20251106_133318\docs\01-requirements
+[2025-11-06 13:34:58] INFO: Starting Phase 1: DESIGN
+[2025-11-06 13:35:17] INFO: Design document saved: D:\work\projects\new\tcp-claude-20251106_133318\DESIGN.md
+[2025-11-06 13:35:48] ERROR: AGNO workflow failed: 'NoneType' object has no attribute 'generate_content'
+[2025-11-06 13:37:07] INFO: ================================================================================
+[2025-11-06 13:37:08] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 13:37:09] INFO: ================================================================================
+[2025-11-06 13:37:10] INFO: Location: D:\work\projects\new
+[2025-11-06 13:38:36] INFO: Project: D:\work\projects\new\tcp-claude-20251106_133318
+[2025-11-06 13:38:39] INFO: Session completed successfully

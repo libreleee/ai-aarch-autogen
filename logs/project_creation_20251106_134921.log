@@ -1,0 +1,45 @@
+[2025-11-06 13:49:21] INFO: 📄 Log file: logs\project_creation_20251106_134921.log
+[2025-11-06 13:49:21] INFO: EXECUTION_MODE: cli
+[2025-11-06 13:49:21] INFO: API_PROVIDER: gemini
+[2025-11-06 13:49:21] INFO: CLI_PROVIDER: claude-cli
+[2025-11-06 13:49:21] DEBUG: Using proactor: IocpProactor
+[2025-11-06 13:49:21] INFO: ================================================================================
+[2025-11-06 13:49:21] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 13:49:21] INFO: ================================================================================
+[2025-11-06 13:49:21] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 13:49:21] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 13:49:21] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 13:49:21] DEBUG: Created directory: workspace\test_results
+[2025-11-06 13:49:21] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 13:49:21] DEBUG: Created directory: logs
+[2025-11-06 13:49:21] INFO: ✓ Bridge workspace initialized
+[2025-11-06 13:49:24] INFO: Selected platforms: ['agno']
+[2025-11-06 13:49:42] INFO: Project name: tcp_summer
+[2025-11-06 13:49:42] INFO: Base location: D:\work\projects\new
+[2025-11-06 13:49:42] INFO: Timestamp: 20251106_134942
+[2025-11-06 13:49:42] INFO: Created project directory: D:\work\projects\new\tcp_summer-20251106_134942
+[2025-11-06 13:49:42] INFO: Created docs directory: D:\work\projects\new\tcp_summer-20251106_134942\docs
+[2025-11-06 13:49:42] INFO: Created requirements directory: D:\work\projects\new\tcp_summer-20251106_134942\docs\01-requirements
+[2025-11-06 13:50:00] INFO: CLI Mode: claude-cli (model: haiku)
+[2025-11-06 13:50:00] INFO: Starting Phase 0: COST ESTIMATION
+[2025-11-06 13:50:00] INFO: Starting Phase 1: DESIGN
+[2025-11-06 13:50:00] ERROR: Exception details:
+Traceback (most recent call last):
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 1872, in run_actor_critic_workflow
+    design_result = await team.design_phase()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 668, in design_phase
+    response = self._generate_content(design_prompt)
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 242, in _generate_content
+    response_text = self._generate_content_claude_cli(prompt)
+  File "D:\work\agent\aarch-autogen\test\summer\actor_critic.py", line 472, in _generate_content_claude_cli
+    from libs.agno.claude_cli_pkg import ClaudeCliProvider
+ModuleNotFoundError: No module named 'libs.agno'
+
+[2025-11-06 13:50:00] ERROR: AGNO workflow failed: No module named 'libs.agno'
+[2025-11-06 13:50:00] INFO: ================================================================================
+[2025-11-06 13:50:00] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 13:50:00] INFO: ================================================================================
+[2025-11-06 13:50:00] INFO: Location: D:\work\projects\new
+[2025-11-06 13:50:00] INFO: Project: D:\work\projects\new\tcp_summer-20251106_134942
+[2025-11-06 13:50:00] INFO: Session completed successfully

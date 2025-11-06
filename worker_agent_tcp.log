@@ -1,0 +1,108 @@
+2025-11-06 17:46:25,636 - __main__ - INFO - Starting TCP Worker Agent Server...
+2025-11-06 17:46:25,636 - TCPOrchestrator - INFO - Starting TCP Orchestrator on localhost:8888 with 4 workers
+2025-11-06 17:46:25,642 - TCPOrchestrator - INFO - TCP Orchestrator started successfully
+2025-11-06 17:47:42,299 - TCPOrchestrator - INFO - Accepted connection conn-1762418862299-0 from ('127.0.0.1', 65514)
+2025-11-06 17:47:42,299 - TCPWorkerAgent-worker-1 - INFO - Processing task task-0 for client conn-1762418862299-0
+2025-11-06 17:47:42,300 - TCPWorkerAgent-worker-1 - INFO - New client connected: conn-1762418862299-0 from ('127.0.0.1', 65514)
+2025-11-06 17:47:42,309 - TCPWorkerAgent-worker-1 - INFO - Task task-0 completed successfully
+2025-11-06 17:47:42,407 - TCPWorkerAgent-worker-2 - INFO - Processing task task-1 for client conn-1762418862299-0
+2025-11-06 17:47:42,408 - TCPWorkerAgent-worker-2 - INFO - Received message from conn-1762418862299-0: {'type': 'echo', 'data': 'Hello from client 1!', 'timestamp': 1762418862.4071019}
+2025-11-06 17:47:42,409 - TCPWorkerAgent-worker-2 - INFO - Task task-1 completed successfully
+2025-11-06 17:47:42,409 - TCPWorkerAgent-worker-3 - INFO - Processing task task-2 for client conn-1762418862299-0
+2025-11-06 17:47:42,409 - TCPWorkerAgent-worker-3 - INFO - Received message from conn-1762418862299-0: {'type': 'status', 'timestamp': 1762418862.4090557}
+2025-11-06 17:47:42,409 - TCPWorkerAgent-worker-3 - INFO - Task task-2 completed successfully
+2025-11-06 17:47:42,410 - TCPWorkerAgent-worker-4 - INFO - Processing task task-3 for client conn-1762418862299-0
+2025-11-06 17:47:42,410 - TCPWorkerAgent-worker-4 - INFO - Received raw message from conn-1762418862299-0: b'Raw message from client 1'
+2025-11-06 17:47:42,411 - TCPWorkerAgent-worker-4 - INFO - Task task-3 completed successfully
+2025-11-06 17:47:43,425 - TCPOrchestrator - ERROR - Error handling messages from conn-1762418862299-0: [WinError 64] 지정된 네트워크 이름을 더 이상 사용할 수 없습니다
+2025-11-06 17:47:43,427 - TCPWorkerAgent-worker-1 - INFO - Processing task task-4 for client conn-1762418862299-0
+2025-11-06 17:47:43,427 - TCPWorkerAgent-worker-1 - INFO - Client disconnected: conn-1762418862299-0
+2025-11-06 17:47:43,427 - TCPWorkerAgent-worker-1 - INFO - Task task-4 completed successfully
+2025-11-06 17:50:06,414 - TCPOrchestrator - INFO - Accepted connection conn-1762419006414-0 from ('127.0.0.1', 59556)
+2025-11-06 17:50:06,415 - TCPWorkerAgent-worker-2 - INFO - Processing task task-5 for client conn-1762419006414-0
+2025-11-06 17:50:06,415 - TCPWorkerAgent-worker-2 - INFO - New client connected: conn-1762419006414-0 from ('127.0.0.1', 59556)
+2025-11-06 17:50:06,415 - TCPWorkerAgent-worker-2 - INFO - Task task-5 completed successfully
+2025-11-06 17:50:06,503 - TCPOrchestrator - INFO - Accepted connection conn-1762419006503-1 from ('127.0.0.1', 59557)
+2025-11-06 17:50:06,503 - TCPWorkerAgent-worker-3 - INFO - Processing task task-6 for client conn-1762419006503-1
+2025-11-06 17:50:06,503 - TCPWorkerAgent-worker-3 - INFO - New client connected: conn-1762419006503-1 from ('127.0.0.1', 59557)
+2025-11-06 17:50:06,504 - TCPWorkerAgent-worker-3 - INFO - Task task-6 completed successfully
+2025-11-06 17:50:06,518 - TCPWorkerAgent-worker-4 - INFO - Processing task task-7 for client conn-1762419006414-0
+2025-11-06 17:50:06,518 - TCPWorkerAgent-worker-4 - INFO - Received message from conn-1762419006414-0: {'type': 'echo', 'data': 'Hello from client 1!', 'timestamp': 1762419006.516816}
+2025-11-06 17:50:06,518 - TCPWorkerAgent-worker-4 - INFO - Task task-7 completed successfully
+2025-11-06 17:50:06,519 - TCPWorkerAgent-worker-1 - INFO - Processing task task-8 for client conn-1762419006414-0
+2025-11-06 17:50:06,519 - TCPWorkerAgent-worker-1 - INFO - Received message from conn-1762419006414-0: {'type': 'status', 'timestamp': 1762419006.5180495}
+2025-11-06 17:50:06,519 - TCPWorkerAgent-worker-1 - INFO - Task task-8 completed successfully
+2025-11-06 17:50:06,519 - TCPWorkerAgent-worker-2 - INFO - Processing task task-9 for client conn-1762419006414-0
+2025-11-06 17:50:06,519 - TCPWorkerAgent-worker-2 - INFO - Received raw message from conn-1762419006414-0: b'Raw message from client 1'
+2025-11-06 17:50:06,520 - TCPWorkerAgent-worker-2 - INFO - Task task-9 completed successfully
+2025-11-06 17:50:06,608 - TCPWorkerAgent-worker-3 - INFO - Processing task task-10 for client conn-1762419006503-1
+2025-11-06 17:50:06,608 - TCPWorkerAgent-worker-3 - INFO - Received message from conn-1762419006503-1: {'type': 'echo', 'data': 'Hello from client 2!', 'timestamp': 1762419006.6077018}
+2025-11-06 17:50:06,608 - TCPWorkerAgent-worker-3 - INFO - Task task-10 completed successfully
+2025-11-06 17:50:06,609 - TCPWorkerAgent-worker-4 - INFO - Processing task task-11 for client conn-1762419006503-1
+2025-11-06 17:50:06,610 - TCPWorkerAgent-worker-4 - INFO - Received message from conn-1762419006503-1: {'type': 'status', 'timestamp': 1762419006.6088552}
+2025-11-06 17:50:06,610 - TCPWorkerAgent-worker-4 - INFO - Task task-11 completed successfully
+2025-11-06 17:50:06,610 - TCPWorkerAgent-worker-4 - INFO - Processing task task-12 for client conn-1762419006503-1
+2025-11-06 17:50:06,611 - TCPWorkerAgent-worker-4 - INFO - Received raw message from conn-1762419006503-1: b'Raw message from client 2'
+2025-11-06 17:50:06,611 - TCPWorkerAgent-worker-4 - INFO - Task task-12 completed successfully
+2025-11-06 17:50:06,611 - TCPOrchestrator - INFO - Accepted connection conn-1762419006611-2 from ('127.0.0.1', 59558)
+2025-11-06 17:50:06,611 - TCPWorkerAgent-worker-2 - INFO - Processing task task-13 for client conn-1762419006611-2
+2025-11-06 17:50:06,611 - TCPWorkerAgent-worker-2 - INFO - New client connected: conn-1762419006611-2 from ('127.0.0.1', 59558)
+2025-11-06 17:50:06,611 - TCPWorkerAgent-worker-2 - INFO - Task task-13 completed successfully
+2025-11-06 17:50:06,713 - TCPWorkerAgent-worker-3 - INFO - Processing task task-14 for client conn-1762419006611-2
+2025-11-06 17:50:06,714 - TCPWorkerAgent-worker-3 - INFO - Received message from conn-1762419006611-2: {'type': 'echo', 'data': 'Hello from client 3!', 'timestamp': 1762419006.7128594}
+2025-11-06 17:50:06,714 - TCPWorkerAgent-worker-3 - INFO - Task task-14 completed successfully
+2025-11-06 17:50:06,714 - TCPWorkerAgent-worker-4 - INFO - Processing task task-15 for client conn-1762419006611-2
+2025-11-06 17:50:06,714 - TCPWorkerAgent-worker-4 - INFO - Received message from conn-1762419006611-2: {'type': 'status', 'timestamp': 1762419006.714161}
+2025-11-06 17:50:06,715 - TCPWorkerAgent-worker-4 - INFO - Task task-15 completed successfully
+2025-11-06 17:50:06,715 - TCPOrchestrator - INFO - Accepted connection conn-1762419006715-3 from ('127.0.0.1', 59559)
+2025-11-06 17:50:06,716 - TCPWorkerAgent-worker-1 - INFO - Processing task task-16 for client conn-1762419006611-2
+2025-11-06 17:50:06,716 - TCPWorkerAgent-worker-1 - INFO - Received raw message from conn-1762419006611-2: b'Raw message from client 3'
+2025-11-06 17:50:06,716 - TCPWorkerAgent-worker-1 - INFO - Task task-16 completed successfully
+2025-11-06 17:50:06,716 - TCPWorkerAgent-worker-1 - INFO - Processing task task-17 for client conn-1762419006715-3
+2025-11-06 17:50:06,717 - TCPWorkerAgent-worker-1 - INFO - New client connected: conn-1762419006715-3 from ('127.0.0.1', 59559)
+2025-11-06 17:50:06,717 - TCPWorkerAgent-worker-1 - INFO - Task task-17 completed successfully
+2025-11-06 17:50:06,819 - TCPWorkerAgent-worker-3 - INFO - Processing task task-18 for client conn-1762419006715-3
+2025-11-06 17:50:06,820 - TCPWorkerAgent-worker-3 - INFO - Received message from conn-1762419006715-3: {'type': 'echo', 'data': 'Hello from client 4!', 'timestamp': 1762419006.8193243}
+2025-11-06 17:50:06,820 - TCPWorkerAgent-worker-3 - INFO - Task task-18 completed successfully
+2025-11-06 17:50:06,821 - TCPOrchestrator - INFO - Accepted connection conn-1762419006821-4 from ('127.0.0.1', 59560)
+2025-11-06 17:50:06,821 - TCPWorkerAgent-worker-4 - INFO - Processing task task-19 for client conn-1762419006715-3
+2025-11-06 17:50:06,822 - TCPWorkerAgent-worker-4 - INFO - Received message from conn-1762419006715-3: {'type': 'status', 'timestamp': 1762419006.8198407}
+2025-11-06 17:50:06,822 - TCPWorkerAgent-worker-4 - INFO - Task task-19 completed successfully
+2025-11-06 17:50:06,822 - TCPWorkerAgent-worker-4 - INFO - Processing task task-20 for client conn-1762419006715-3
+2025-11-06 17:50:06,823 - TCPWorkerAgent-worker-4 - INFO - Received raw message from conn-1762419006715-3: b'Raw message from client 4'
+2025-11-06 17:50:06,823 - TCPWorkerAgent-worker-4 - INFO - Task task-20 completed successfully
+2025-11-06 17:50:06,823 - TCPWorkerAgent-worker-4 - INFO - Processing task task-21 for client conn-1762419006821-4
+2025-11-06 17:50:06,824 - TCPWorkerAgent-worker-4 - INFO - New client connected: conn-1762419006821-4 from ('127.0.0.1', 59560)
+2025-11-06 17:50:06,824 - TCPWorkerAgent-worker-4 - INFO - Task task-21 completed successfully
+2025-11-06 17:50:06,924 - TCPWorkerAgent-worker-3 - INFO - Processing task task-22 for client conn-1762419006821-4
+2025-11-06 17:50:06,925 - TCPWorkerAgent-worker-3 - INFO - Received message from conn-1762419006821-4: {'type': 'echo', 'data': 'Hello from client 5!', 'timestamp': 1762419006.924538}
+2025-11-06 17:50:06,925 - TCPWorkerAgent-worker-3 - INFO - Task task-22 completed successfully
+2025-11-06 17:50:06,925 - TCPWorkerAgent-worker-4 - INFO - Processing task task-23 for client conn-1762419006821-4
+2025-11-06 17:50:06,925 - TCPWorkerAgent-worker-4 - INFO - Received message from conn-1762419006821-4: {'type': 'status', 'timestamp': 1762419006.9252899}
+2025-11-06 17:50:06,926 - TCPWorkerAgent-worker-4 - INFO - Task task-23 completed successfully
+2025-11-06 17:50:06,926 - TCPWorkerAgent-worker-1 - INFO - Processing task task-24 for client conn-1762419006821-4
+2025-11-06 17:50:06,927 - TCPWorkerAgent-worker-1 - INFO - Received raw message from conn-1762419006821-4: b'Raw message from client 5'
+2025-11-06 17:50:06,927 - TCPWorkerAgent-worker-1 - INFO - Task task-24 completed successfully
+2025-11-06 17:50:07,526 - TCPOrchestrator - ERROR - Error handling messages from conn-1762419006414-0: [WinError 64] 지정된 네트워크 이름을 더 이상 사용할 수 없습니다
+2025-11-06 17:50:07,526 - TCPWorkerAgent-worker-2 - INFO - Processing task task-25 for client conn-1762419006414-0
+2025-11-06 17:50:07,527 - TCPWorkerAgent-worker-2 - INFO - Client disconnected: conn-1762419006414-0
+2025-11-06 17:50:07,527 - TCPWorkerAgent-worker-2 - INFO - Task task-25 completed successfully
+2025-11-06 17:50:07,617 - TCPOrchestrator - ERROR - Error handling messages from conn-1762419006503-1: [WinError 64] 지정된 네트워크 이름을 더 이상 사용할 수 없습니다
+2025-11-06 17:50:07,618 - TCPWorkerAgent-worker-3 - INFO - Processing task task-26 for client conn-1762419006503-1
+2025-11-06 17:50:07,618 - TCPWorkerAgent-worker-3 - INFO - Client disconnected: conn-1762419006503-1
+2025-11-06 17:50:07,618 - TCPWorkerAgent-worker-3 - INFO - Task task-26 completed successfully
+2025-11-06 17:50:07,723 - TCPOrchestrator - ERROR - Error handling messages from conn-1762419006611-2: [WinError 64] 지정된 네트워크 이름을 더 이상 사용할 수 없습니다
+2025-11-06 17:50:07,723 - TCPWorkerAgent-worker-4 - INFO - Processing task task-27 for client conn-1762419006611-2
+2025-11-06 17:50:07,723 - TCPWorkerAgent-worker-4 - INFO - Client disconnected: conn-1762419006611-2
+2025-11-06 17:50:07,724 - TCPWorkerAgent-worker-4 - INFO - Task task-27 completed successfully
+2025-11-06 17:50:07,827 - TCPOrchestrator - ERROR - Error handling messages from conn-1762419006715-3: [WinError 64] 지정된 네트워크 이름을 더 이상 사용할 수 없습니다
+2025-11-06 17:50:07,828 - TCPWorkerAgent-worker-1 - INFO - Processing task task-28 for client conn-1762419006715-3
+2025-11-06 17:50:07,828 - TCPWorkerAgent-worker-1 - INFO - Client disconnected: conn-1762419006715-3
+2025-11-06 17:50:07,829 - TCPWorkerAgent-worker-1 - INFO - Task task-28 completed successfully
+2025-11-06 17:50:07,933 - TCPOrchestrator - ERROR - Error handling messages from conn-1762419006821-4: [WinError 64] 지정된 네트워크 이름을 더 이상 사용할 수 없습니다
+2025-11-06 17:50:07,933 - TCPWorkerAgent-worker-2 - INFO - Processing task task-29 for client conn-1762419006821-4
+2025-11-06 17:50:07,934 - TCPWorkerAgent-worker-2 - INFO - Client disconnected: conn-1762419006821-4
+2025-11-06 17:50:07,934 - TCPWorkerAgent-worker-2 - INFO - Task task-29 completed successfully
+2025-11-06 18:40:33,707 - TCPOrchestrator - INFO - Shutting down TCP Orchestrator...
+2025-11-06 18:40:33,715 - TCPOrchestrator - INFO - TCP Orchestrator shutdown complete
+2025-11-06 18:40:33,716 - __main__ - INFO - Server shutdown complete

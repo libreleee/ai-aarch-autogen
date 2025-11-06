@@ -1,0 +1,54 @@
+2025-11-06 19:30:40,841 - root - INFO - Starting TCP Worker Agent Server with AutoGen...
+2025-11-06 19:30:40,907 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:30:40,927 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:30:40,947 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:30:40,966 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:30:40,976 - TCPOrchestrator - INFO - Starting TCP Orchestrator on localhost:8888 with 4 workers
+2025-11-06 19:30:40,984 - TCPOrchestrator - INFO - TCP Orchestrator started successfully
+2025-11-06 19:31:57,234 - TCPOrchestrator - INFO - Accepted connection 1762425117234-0 from ('127.0.0.1', 58570)
+2025-11-06 19:31:57,336 - TCPOrchestrator - WARNING - Invalid JSON from 1762425117234-0: b'\x00\x00\x00Q{"type": "echo", "data": "Hello from client 1!", "timestamp": 1762425117.3345087}'
+2025-11-06 19:33:26,715 - TCPOrchestrator - INFO - Accepted connection 1762425206715-1 from ('127.0.0.1', 50928)
+2025-11-06 19:33:26,716 - TCPOrchestrator - WARNING - Invalid JSON from 1762425206715-1: b'GET / HTTP/1.1\r\nHost: localhost:8888\r\nConnection: keep-alive\r\nsec-ch-ua: "Chromium";v="142", "Google Chrome";v="142", "Not_A Brand";v="99"\r\nsec-ch-ua-mobile: ?0\r\nsec-ch-ua-platform: "Windows"\r\nUpgrade-Insecure-Requests: 1\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7\r\nSec-Fetch-Site: none\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-User: ?1\r\nSec-Fetch-Dest: document\r\nAccept-Encoding: gzip, deflate, br, zstd\r\nAccept-Language: ko\r\n\r\n'
+2025-11-06 19:33:26,973 - TCPOrchestrator - INFO - Accepted connection 1762425206973-2 from ('127.0.0.1', 61445)
+2025-11-06 19:33:46,459 - TCPOrchestrator - INFO - Client 1762425206973-2 disconnected
+2025-11-06 19:37:38,996 - TCPOrchestrator - INFO - Shutting down TCP Orchestrator...
+2025-11-06 19:37:38,998 - TCPOrchestrator - INFO - TCP Orchestrator shutdown complete
+2025-11-06 19:37:38,999 - root - INFO - Server shutdown complete
+2025-11-06 19:37:39,001 - TCPOrchestrator - ERROR - Error handling messages from 1762425117234-0: [WinError 1236] 네트워크 연결이 로컬 시스템에 의해 취소되었습니다
+2025-11-06 19:37:39,002 - TCPOrchestrator - INFO - Client 1762425117234-0 disconnected
+2025-11-06 19:37:39,002 - TCPOrchestrator - ERROR - Error handling messages from 1762425206715-1: [WinError 1236] 네트워크 연결이 로컬 시스템에 의해 취소되었습니다
+2025-11-06 19:37:39,002 - TCPOrchestrator - INFO - Client 1762425206715-1 disconnected
+2025-11-06 19:39:34,992 - root - INFO - Starting TCP Worker Agent Server with AutoGen...
+2025-11-06 19:39:35,085 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:39:35,104 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:39:35,123 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:39:35,142 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:39:35,143 - TCPOrchestrator - INFO - Starting TCP Orchestrator on localhost:8888 with 4 workers
+2025-11-06 19:39:35,149 - TCPOrchestrator - INFO - TCP Orchestrator started successfully
+2025-11-06 19:40:03,226 - TCPOrchestrator - INFO - Shutting down TCP Orchestrator...
+2025-11-06 19:40:03,226 - TCPOrchestrator - INFO - TCP Orchestrator shutdown complete
+2025-11-06 19:40:03,226 - root - INFO - Server shutdown complete
+2025-11-06 19:40:22,227 - root - INFO - Starting TCP Worker Agent Server with AutoGen...
+2025-11-06 19:40:22,297 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:40:22,316 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:40:22,336 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:40:22,355 - autogen.oai.client - WARNING - The API key specified is not a valid OpenAI format; it won't work with the OpenAI-hosted model.
+2025-11-06 19:40:22,356 - TCPOrchestrator - INFO - Starting TCP Orchestrator on localhost:8888 with 4 workers
+2025-11-06 19:40:22,362 - TCPOrchestrator - INFO - TCP Orchestrator started successfully
+2025-11-06 19:41:20,692 - TCPOrchestrator - INFO - Accepted connection 1762425680692-0 from ('127.0.0.1', 57606)
+2025-11-06 19:41:20,793 - TCPOrchestrator - INFO - Received message from 1762425680692-0: {'type': 'echo', 'data': 'Hello from client 1!', 'timestamp': 1762425680.7926428}
+2025-11-06 19:41:20,793 - TCPWorkerAgent-worker-1 - INFO - Processing task unknown for client 1762425680692-0
+2025-11-06 19:41:24,101 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2025-11-06 19:41:24,103 - TCPWorkerAgent-worker-1 - ERROR - Error processing task None: Error code: 401 - {'error': {'message': 'Incorrect API key provided: AIzaSyAn***************************9sCs. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+2025-11-06 19:41:24,103 - TCPOrchestrator - INFO - Sent result to client 1762425680692-0
+2025-11-06 19:41:24,128 - TCPOrchestrator - INFO - Received message from 1762425680692-0: {'type': 'status', 'timestamp': 1762425684.128015}
+2025-11-06 19:41:24,128 - TCPWorkerAgent-worker-2 - INFO - Processing task unknown for client 1762425680692-0
+2025-11-06 19:41:24,337 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2025-11-06 19:41:24,338 - TCPWorkerAgent-worker-2 - ERROR - Error processing task None: Error code: 401 - {'error': {'message': 'Incorrect API key provided: AIzaSyAn***************************9sCs. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+2025-11-06 19:41:24,338 - TCPOrchestrator - INFO - Sent result to client 1762425680692-0
+2025-11-06 19:41:24,358 - TCPOrchestrator - WARNING - Invalid JSON from 1762425680692-0: b'Raw message from client 1'
+2025-11-06 19:42:16,813 - TCPOrchestrator - INFO - Shutting down TCP Orchestrator...
+2025-11-06 19:42:16,813 - TCPOrchestrator - INFO - TCP Orchestrator shutdown complete
+2025-11-06 19:42:16,813 - root - INFO - Server shutdown complete
+2025-11-06 19:42:16,814 - TCPOrchestrator - ERROR - Error handling messages from 1762425680692-0: [WinError 1236] 네트워크 연결이 로컬 시스템에 의해 취소되었습니다
+2025-11-06 19:42:16,815 - TCPOrchestrator - INFO - Client 1762425680692-0 disconnected

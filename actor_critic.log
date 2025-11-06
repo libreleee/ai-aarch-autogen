@@ -1,0 +1,23 @@
+2025-11-06 14:34:47,400 - INFO - CLI Mode: claude-cli (model: haiku)
+2025-11-06 14:34:47,401 - INFO - [claude-cli] prompt=46chars
+2025-11-06 14:34:47,402 - INFO - [claude-cli] executing: powershell.exe -NoProfile -ExecutionPolicy Bypass -Command claude -p "@C:\Users\i\AppData\Local\Temp\tmpitgqqpy6.txt" --model haiku
+2025-11-06 14:34:55,165 - INFO - [claude-cli] return_code=0
+2025-11-06 14:34:55,166 - INFO - [claude-cli] stdout_len=1307
+2025-11-06 14:34:55,166 - INFO - [claude-cli] stderr_len=0
+2025-11-06 14:34:55,167 - INFO - [claude-cli] success: 1306 chars
+2025-11-06 14:35:54,116 - INFO - Starting Codex CLI path detection (5 stages)...
+2025-11-06 14:35:54,303 - INFO - [Stage 2] Found via 'where.exe': C:\nvm4w\nodejs\codex
+2025-11-06 14:35:54,304 - INFO - ✅ Codex CLI found: C:\nvm4w\nodejs\codex
+2025-11-06 14:35:54,304 - INFO - CLI Mode: codex-cli (model: exec)
+2025-11-06 14:35:54,306 - INFO - [codex-cli] prompt=46chars, korean=False
+2025-11-06 14:35:54,306 - INFO - [codex-cli] using codex_path: C:\nvm4w\nodejs\codex
+2025-11-06 14:36:26,460 - INFO - [codex-cli] return_code=0
+2025-11-06 14:36:26,461 - INFO - [codex-cli] output file created after 0.0s
+2025-11-06 14:36:26,462 - INFO - [codex-cli] success: 411 chars from file
+2025-11-06 14:37:16,865 - INFO - CLI Mode: claude-cli (model: haiku)
+2025-11-06 14:37:16,866 - INFO - [claude-cli] prompt=46chars
+2025-11-06 14:37:16,868 - INFO - [claude-cli] executing: powershell.exe -NoProfile -ExecutionPolicy Bypass -Command claude -p "@C:\Users\i\AppData\Local\Temp\tmp9jsqeni5.txt" --model haiku
+2025-11-06 14:37:31,754 - INFO - [claude-cli] return_code=0
+2025-11-06 14:37:31,754 - INFO - [claude-cli] stdout_len=829
+2025-11-06 14:37:31,755 - INFO - [claude-cli] stderr_len=0
+2025-11-06 14:37:31,755 - INFO - [claude-cli] success: 828 chars

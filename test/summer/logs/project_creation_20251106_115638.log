@@ -1,0 +1,33 @@
+[2025-11-06 11:56:38] INFO: 📄 Log file: logs\project_creation_20251106_115638.log
+[2025-11-06 11:56:38] DEBUG: Using proactor: IocpProactor
+[2025-11-06 11:56:38] INFO: ================================================================================
+[2025-11-06 11:56:38] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 11:56:38] INFO: ================================================================================
+[2025-11-06 11:56:38] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 11:56:38] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 11:56:38] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 11:56:38] DEBUG: Created directory: workspace\test_results
+[2025-11-06 11:56:38] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 11:56:38] DEBUG: Created directory: logs
+[2025-11-06 11:56:38] INFO: ✓ Bridge workspace initialized
+[2025-11-06 11:56:40] INFO: Selected platforms: ['agno']
+[2025-11-06 11:56:46] INFO: Project name: tcp-autogen
+[2025-11-06 11:56:46] INFO: Base location: D:\work\projects\new
+[2025-11-06 11:56:46] INFO: Timestamp: 20251106_115646
+[2025-11-06 11:56:46] INFO: Created project directory: D:\work\projects\new\tcp-autogen-20251106_115646
+[2025-11-06 11:56:46] INFO: Created docs directory: D:\work\projects\new\tcp-autogen-20251106_115646\docs
+[2025-11-06 11:56:46] INFO: Created requirements directory: D:\work\projects\new\tcp-autogen-20251106_115646\docs\01-requirements
+[2025-11-06 11:57:00] INFO: Starting Phase 1: DESIGN
+[2025-11-06 11:57:14] INFO: Design document saved: D:\work\projects\new\tcp-autogen-20251106_115646\DESIGN.md
+[2025-11-06 11:57:44] INFO: AGNO workflow completed successfully
+[2025-11-06 11:57:44] INFO:   Elapsed time: 43.79s
+[2025-11-06 11:57:44] INFO:   Files created: ['server.py', 'client.py']
+[2025-11-06 11:57:44] INFO:   Design iterations: 1
+[2025-11-06 11:57:44] INFO:   Code iterations: 1
+[2025-11-06 11:57:44] INFO:   Coverage: 85%
+[2025-11-06 11:57:44] INFO: ================================================================================
+[2025-11-06 11:57:44] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 11:57:44] INFO: ================================================================================
+[2025-11-06 11:57:44] INFO: Location: D:\work\projects\new
+[2025-11-06 11:57:44] INFO: Project: D:\work\projects\new\tcp-autogen-20251106_115646
+[2025-11-06 11:57:44] INFO: Session completed successfully

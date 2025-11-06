@@ -1,0 +1,76 @@
+[2025-11-06 14:57:59] INFO: 📄 Log file: logs\project_creation_20251106_145759.log
+[2025-11-06 14:57:59] INFO: EXECUTION_MODE: cli
+[2025-11-06 14:57:59] INFO: API_PROVIDER: gemini
+[2025-11-06 14:57:59] INFO: CLI_PROVIDER: copilot-cli
+[2025-11-06 14:57:59] DEBUG: Using proactor: IocpProactor
+[2025-11-06 14:57:59] INFO: ================================================================================
+[2025-11-06 14:57:59] INFO: Starting Multi-Agent Bridge Project Creation
+[2025-11-06 14:57:59] INFO: ================================================================================
+[2025-11-06 14:57:59] INFO: 🔧 Initializing Bridge workspace...
+[2025-11-06 14:57:59] DEBUG: Created directory: workspace\design_drafts
+[2025-11-06 14:57:59] DEBUG: Created directory: workspace\code_drafts
+[2025-11-06 14:57:59] DEBUG: Created directory: workspace\test_results
+[2025-11-06 14:57:59] DEBUG: Created directory: workspace\artifacts
+[2025-11-06 14:57:59] DEBUG: Created directory: logs
+[2025-11-06 14:57:59] INFO: ✓ Bridge workspace initialized
+[2025-11-06 14:58:19] INFO: Selected platforms: ['agno']
+[2025-11-06 14:58:31] INFO: Project name: tcp-autogen
+[2025-11-06 14:58:31] INFO: Base location: D:\work\projects\new
+[2025-11-06 14:58:31] INFO: Timestamp: 20251106_145831
+[2025-11-06 14:58:31] INFO: Created project directory: D:\work\projects\new\tcp-autogen-20251106_145831
+[2025-11-06 14:58:31] INFO: Created docs directory: D:\work\projects\new\tcp-autogen-20251106_145831\docs
+[2025-11-06 14:58:31] INFO: Created requirements directory: D:\work\projects\new\tcp-autogen-20251106_145831\docs\01-requirements
+[2025-11-06 14:59:53] INFO: CLI Mode: copilot-cli (model: claude-haiku-4.5)
+[2025-11-06 14:59:53] INFO: Starting Phase 0: COST ESTIMATION
+[2025-11-06 14:59:53] INFO: Starting Phase 1: DESIGN
+[2025-11-06 14:59:53] INFO: [copilot-cli] prompt=1243chars
+[2025-11-06 15:00:19] INFO: [copilot-cli] return_code=0
+[2025-11-06 15:00:19] INFO: [copilot-cli] stdout_len=3259
+[2025-11-06 15:00:19] INFO: [copilot-cli] success: 3257 chars
+[2025-11-06 15:00:19] INFO: Design draft saved: D:\work\projects\new\tcp-autogen-20251106_145831\DESIGN_DRAFT.md
+[2025-11-06 15:00:19] INFO: [copilot-cli] prompt=505chars
+[2025-11-06 15:01:03] INFO: [copilot-cli] return_code=0
+[2025-11-06 15:01:03] INFO: [copilot-cli] stdout_len=2619
+[2025-11-06 15:01:03] INFO: [copilot-cli] success: 2617 chars
+[2025-11-06 15:02:14] INFO: Cost estimate saved: D:\work\projects\new\tcp-autogen-20251106_145831\docs\03-rfp\ESTIMATE.md
+[2025-11-06 15:02:14] INFO: [copilot-cli] prompt=973chars
+[2025-11-06 15:02:32] INFO: [copilot-cli] return_code=0
+[2025-11-06 15:02:32] INFO: [copilot-cli] stdout_len=2857
+[2025-11-06 15:02:32] INFO: [copilot-cli] success: 2855 chars
+[2025-11-06 15:02:32] INFO: [copilot-cli] prompt=1082chars
+[2025-11-06 15:02:42] INFO: [copilot-cli] return_code=0
+[2025-11-06 15:02:42] INFO: [copilot-cli] stdout_len=646
+[2025-11-06 15:02:42] INFO: [copilot-cli] success: 644 chars
+[2025-11-06 15:02:42] INFO: Implementing server.py, prompt has Korean: True, length: 4602
+[2025-11-06 15:02:42] INFO: [copilot-cli] prompt=4602chars
+[2025-11-06 15:03:07] INFO: [copilot-cli] return_code=0
+[2025-11-06 15:03:07] INFO: [copilot-cli] stdout_len=8113
+[2025-11-06 15:03:07] INFO: [copilot-cli] success: 8111 chars
+[2025-11-06 15:03:07] DEBUG: Response for server.py: length=8111, extracted code length=8097
+[2025-11-06 15:03:07] INFO: Implementing client.py, prompt has Korean: True, length: 4605
+[2025-11-06 15:03:07] INFO: [copilot-cli] prompt=4605chars
+[2025-11-06 15:03:33] INFO: [copilot-cli] return_code=0
+[2025-11-06 15:03:33] INFO: [copilot-cli] stdout_len=9232
+[2025-11-06 15:03:33] INFO: [copilot-cli] success: 9230 chars
+[2025-11-06 15:03:33] DEBUG: Response for client.py: length=9230, extracted code length=9216
+[2025-11-06 15:03:33] INFO: [copilot-cli] prompt=1741chars
+[2025-11-06 15:04:55] INFO: [copilot-cli] return_code=0
+[2025-11-06 15:04:55] INFO: [copilot-cli] stdout_len=21228
+[2025-11-06 15:04:55] INFO: [copilot-cli] success: 21226 chars
+[2025-11-06 15:04:55] INFO: [copilot-cli] prompt=1741chars
+[2025-11-06 15:05:54] INFO: [copilot-cli] return_code=0
+[2025-11-06 15:05:54] INFO: [copilot-cli] stdout_len=19370
+[2025-11-06 15:05:54] INFO: [copilot-cli] success: 19368 chars
+[2025-11-06 15:05:54] INFO: Project metrics saved: D:\work\projects\new\tcp-autogen-20251106_145831\docs\06-delivery\PROJECT_METRICS.md
+[2025-11-06 15:05:54] INFO: AGNO workflow completed successfully
+[2025-11-06 15:05:54] INFO:   Elapsed time: 362.58s
+[2025-11-06 15:05:54] INFO:   Files created: ['server.py', 'client.py']
+[2025-11-06 15:05:54] INFO:   Design iterations: 1
+[2025-11-06 15:05:54] INFO:   Code iterations: 1
+[2025-11-06 15:05:54] INFO:   Coverage: 85%
+[2025-11-06 15:05:54] INFO: ================================================================================
+[2025-11-06 15:05:54] INFO: PROJECT CREATION COMPLETED!
+[2025-11-06 15:05:54] INFO: ================================================================================
+[2025-11-06 15:05:54] INFO: Location: D:\work\projects\new
+[2025-11-06 15:05:54] INFO: Project: D:\work\projects\new\tcp-autogen-20251106_145831
+[2025-11-06 15:05:54] INFO: Session completed successfully
