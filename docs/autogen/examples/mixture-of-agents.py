@@ -13,6 +13,13 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
+from dotenv import load_dotenv
+import autogen
+from autogen import AssistantAgent, UserProxyAgent
+
+# Load environment variables
+load_dotenv()
+import os
 
 
 class Perspective(Enum):
@@ -139,44 +146,139 @@ class PerspectiveAgent:
         requirements: str, 
         characteristics: Dict
     ) -> str:
-        """관점별 코드 생성 (시뮬레이션)"""
+        """관점별 코드 생성 (실제 AutoGen + Gemini API 사용)"""
         
-        # 실제로는 LLM API 호출
+        try:
+            # Gemini API 직접 사용
+            import google.generativeai as genai
+            
+            api_key = os.getenv("GOOGLE_API_KEY")
+            if not api_key:
+                raise ValueError("GOOGLE_API_KEY not found in environment variables")
+            
+            genai.configure(api_key=api_key)
+            
+            model = genai.GenerativeModel('gemini-2.0-flash-exp')
+            
+            prompt = f"""{self._create_system_prompt(characteristics)}
+
+{self._create_code_generation_prompt(file_name, requirements, characteristics)}"""
+            
+            response = model.generate_content(prompt)
+            
+            if response and response.text:
+                return self._extract_code_from_response(response.text)
+            else:
+                raise ValueError("Empty response from Gemini API")
+            
+        except Exception as e:
+            print(f"    [{self.perspective.value.title()}] ❌ LLM call failed: {e}")
+            # 폴백: 시뮬레이션 코드 생성
+            return self._generate_fallback_code(file_name, requirements, characteristics)
+    
+    def _create_system_prompt(self, characteristics: Dict) -> str:
+        """관점별 시스템 프롬프트 생성"""
+        
+        focus = characteristics["focus"]
+        keywords = ", ".join(characteristics["keywords"])
+        patterns = ", ".join(characteristics["patterns"])
+        
+        return f"""You are a senior software engineer specializing in {focus}.
+
+Your expertise focuses on:
+- {focus}
+- Key principles: {keywords}
+- Design patterns: {patterns}
+
+When generating code, always prioritize {focus} above all other considerations.
+Provide clean, well-structured Python code with proper documentation.
+Focus on practical, production-ready implementations."""
+
+    def _create_code_generation_prompt(self, file_name: str, requirements: str, characteristics: Dict) -> str:
+        """코드 생성 프롬프트 생성"""
+        
+        focus = characteristics["focus"]
+        keywords = ", ".join(characteristics["keywords"][:3])
+        
+        return f"""Generate Python code for the file: {file_name}
+
+Requirements: {requirements}
+
+IMPORTANT: Focus on {focus} in your implementation.
+Incorporate these key aspects: {keywords}
+
+Provide only the Python code without any markdown formatting or explanations.
+The code should be complete, functional, and follow Python best practices."""
+
+    def _extract_code_from_response(self, response) -> str:
+        """AutoGen 응답에서 코드 추출"""
+        
+        if hasattr(response, 'content'):
+            content = response.content
+        elif isinstance(response, str):
+            content = response
+        else:
+            content = str(response)
+        
+        # 코드 블록에서 추출 시도
+        import re
+        code_match = re.search(r'```python\s*(.*?)\s*```', content, re.DOTALL)
+        if code_match:
+            return code_match.group(1).strip()
+        
+        # 일반 코드 블록
+        code_match = re.search(r'```\s*(.*?)\s*```', content, re.DOTALL)
+        if code_match:
+            return code_match.group(1).strip()
+        
+        # 코드가 직접 있는 경우
+        return content.strip()
+    
+    def _generate_fallback_code(self, file_name: str, requirements: str, characteristics: Dict) -> str:
+        """LLM 호출 실패 시 폴백 코드 생성"""
+        
         template_parts = []
         
         # 파일 타입에 따른 기본 구조
         if "model" in file_name.lower():
             template_parts.append("class UserModel:")
+            template_parts.append("    \"\"\"User data model with validation\"\"\"")
+            template_parts.append("    ")
+            template_parts.append("    def __init__(self, user_id: int, name: str, email: str):")
+            template_parts.append("        self.user_id = user_id")
+            template_parts.append("        self.name = name")
+            template_parts.append("        self.email = email")
+            template_parts.append("    ")
+            template_parts.append("    def validate(self) -> bool:")
+            template_parts.append("        \"\"\"Validate user data\"\"\"")
+            template_parts.append("        return bool(self.name and self.email)")
+            
         elif "service" in file_name.lower():
             template_parts.append("class AuthService:")
+            template_parts.append("    \"\"\"Authentication service\"\"\"")
+            template_parts.append("    ")
+            template_parts.append("    def authenticate(self, username: str, password: str) -> bool:")
+            template_parts.append("        \"\"\"Authenticate user credentials\"\"\"")
+            template_parts.append("        # Authentication logic here")
+            template_parts.append("        return True")
+            
         elif "controller" in file_name.lower():
             template_parts.append("class ApiController:")
+            template_parts.append("    \"\"\"REST API controller\"\"\"")
+            template_parts.append("    ")
+            template_parts.append("    def get_users(self):")
+            template_parts.append("        \"\"\"Get all users\"\"\"")
+            template_parts.append("        return []")
+            
         else:
             template_parts.append("class Component:")
+            template_parts.append(f"    \"\"\"{requirements}\"\"\"")
+            template_parts.append("    ")
+            template_parts.append("    def execute(self):")
+            template_parts.append("        \"\"\"Execute component logic\"\"\"")
+            template_parts.append("        pass")
         
-        # 관점별 특성 반영
-        for keyword in characteristics["keywords"][:2]:
-            template_parts.append(f"    # {keyword.title()} implementation")
-            template_parts.append(f"    def {keyword}_method(self): pass")
-        
-        # 관점별 패턴 반영
-        for pattern in characteristics["patterns"][:1]:
-            template_parts.append(f"    # {pattern}")
-            
-        code = "\n".join(template_parts)
-        
-        # 관점별 코드 길이 조정
-        perspective_multipliers = {
-            Perspective.PERFORMANCE: 1.2,  # 최적화 코드로 더 길어짐
-            Perspective.MAINTAINABILITY: 1.5,  # 문서화로 더 길어짐
-            Perspective.SIMPLICITY: 0.8,  # 단순화로 더 짧아짐
-            Perspective.SECURITY: 1.3   # 검증 로직으로 더 길어짐
-        }
-        
-        multiplier = perspective_multipliers.get(self.perspective, 1.0)
-        code = code * int(multiplier)
-        
-        return code
+        return "\n".join(template_parts)
     
     def _calculate_quality_score(self, code: str, characteristics: Dict) -> float:
         """관점별 품질 점수 계산"""

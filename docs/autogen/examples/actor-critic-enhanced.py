@@ -14,6 +14,11 @@ from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
 import logging
+import os
+
+# AutoGen 패키지 import
+import autogen
+from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
 
 
 class QualityLevel(Enum):
@@ -56,15 +61,15 @@ class GenerationResult:
 
 
 class EnhancedWorkerAgent:
-    """강화된 Worker Agent (AutoGen 패턴 적용)"""
-    
+    """AutoGen 기반 강화된 Worker Agent"""
+
     def __init__(self, worker_id: int, specialization: str = "general"):
         self.worker_id = worker_id
         self.specialization = specialization
         self.tasks_completed = 0
         self.total_processing_time = 0.0
-        
-        # 전문화별 특성
+
+        # 전문화별 특성 (먼저 정의)
         self.specializations = {
             "performance": {
                 "speed_multiplier": 1.2,
@@ -87,60 +92,112 @@ class EnhancedWorkerAgent:
                 "focus": "일반적 구현"
             }
         }
+
+        # AutoGen AssistantAgent 생성
+        system_message = self._get_system_message()
+        self.agent = AssistantAgent(
+            name=f"EnhancedWorker_{worker_id}_{specialization}",
+            system_message=system_message,
+            llm_config={
+                "config_list": [
+                    {
+                        "model": "gemini-2.5-flash-lite",
+                        "api_key": os.getenv("GOOGLE_API_KEY"),
+                        "api_type": "google",
+                        "client_host": "https://generativelanguage.googleapis.com"
+                    }
+                ],
+                "temperature": 0.7,
+                "timeout": 120,
+            }
+        )
+
+        # UserProxyAgent for task execution
+        self.user_proxy = UserProxyAgent(
+            name=f"UserProxy_{worker_id}",
+            code_execution_config=False,
+            human_input_mode="NEVER"
+        )
+
+    def _get_system_message(self) -> str:
+        """Worker별 시스템 메시지"""
+        spec_config = self.specializations[self.specialization]
+
+        return f"""You are Enhanced Worker-{self.worker_id}, a specialized {self.specialization} developer.
+
+Your expertise focus: {spec_config["focus"]}
+
+Guidelines for code generation:
+- Write clean, well-documented Python code
+- Include proper error handling and logging
+- Add comprehensive docstrings for all functions and classes
+- Follow Python best practices and design patterns
+- Generate realistic, functional code (not just stubs)
+- Pay special attention to {spec_config["focus"]} aspects
+
+When given a task, respond with complete, runnable Python code in a ```python code block.
+Include all necessary imports, classes, methods, and proper structure.
+"""
     
     async def generate_file(
         self, 
         task: FileTask, 
         context: Dict[str, Any]
     ) -> GenerationResult:
-        """파일 생성 (Worker Agent 방식)"""
-        
+        """실제 AutoGen API 호출로 파일 생성"""
+
         start_time = time.time()
-        
+
         try:
             print(f"    [Worker-{self.worker_id}] 🔨 Generating {task.name} ({self.specialization})")
-            
-            # 전문화에 따른 처리 시간 조정
-            spec_config = self.specializations[self.specialization]
-            base_time = self._get_processing_time(task.complexity)
-            actual_time = base_time / spec_config["speed_multiplier"]
-            
-            # 작업 시뮬레이션
-            await asyncio.sleep(actual_time)
-            
-            # 코드 생성
-            content = await self._generate_content(task, context, spec_config)
-            
-            # 품질 점수 계산
-            base_quality = random.uniform(7.0, 9.0)
-            quality_score = min(10.0, base_quality + spec_config["quality_bonus"])
-            
+
+            # AutoGen 프롬프트 생성
+            prompt = self._create_implementation_prompt(task, context)
+
+            # 실제 AutoGen API 호출
+            chat_result = self.user_proxy.initiate_chat(
+                self.agent,
+                message=prompt,
+                max_turns=1
+            )
+
+            # 응답에서 코드 추출
+            generated_code = self._extract_code_from_response(chat_result)
+
+            # 특성화에 따른 처리 시간 조정 (실제 API 호출 시간 사용)
             processing_time = time.time() - start_time
-            lines_of_code = len(content.split('\n'))
-            
+
+            # 코드 분석으로 품질 점수 계산
+            lines_of_code = len(generated_code.split('\n'))
+            base_quality = self._calculate_code_quality(generated_code, task.complexity)
+
+            # 특성화 보너스 적용
+            spec_config = self.specializations[self.specialization]
+            quality_score = min(10.0, base_quality + spec_config["quality_bonus"])
+
             # 통계 업데이트
             self.tasks_completed += 1
             self.total_processing_time += processing_time
-            
+
             print(f"    [Worker-{self.worker_id}] ✅ Completed {task.name} "
                   f"({processing_time:.1f}s, Q:{quality_score:.1f}, {lines_of_code} lines)")
-            
+
             return GenerationResult(
                 file_name=task.name,
-                content=content,
+                content=generated_code,
                 quality_score=quality_score,
                 generation_method="worker",
                 processing_time=processing_time,
                 lines_of_code=lines_of_code,
                 success=True
             )
-            
+
         except Exception as e:
             processing_time = time.time() - start_time
             error_msg = str(e)
-            
+
             print(f"    [Worker-{self.worker_id}] ❌ Failed {task.name}: {error_msg}")
-            
+
             return GenerationResult(
                 file_name=task.name,
                 content="",
@@ -151,6 +208,92 @@ class EnhancedWorkerAgent:
                 success=False,
                 error=error_msg
             )
+
+    def _calculate_code_quality(self, code: str, complexity: str) -> float:
+        """생성된 코드의 품질 점수 계산"""
+        try:
+            lines = len(code.split('\n'))
+            has_docstrings = '"""' in code or "'''" in code
+            has_error_handling = 'try:' in code and 'except' in code
+            has_imports = 'import ' in code
+            has_functions = 'def ' in code
+            has_classes = 'class ' in code
+
+            # 기본 점수
+            base_score = 6.0
+
+            # 코드 길이 보너스 (적절한 길이)
+            if 30 <= lines <= 200:
+                base_score += 1.0
+            elif lines > 250:
+                base_score -= 0.5
+
+            # 구조적 요소 보너스
+            if has_docstrings:
+                base_score += 0.5
+            if has_error_handling:
+                base_score += 0.5
+            if has_imports:
+                base_score += 0.3
+            if has_functions:
+                base_score += 0.3
+            if has_classes:
+                base_score += 0.4
+
+            # 복잡도별 조정
+            complexity_bonus = {"simple": 0.0, "medium": 0.2, "complex": 0.4, "critical": 0.6}
+            base_score += complexity_bonus.get(complexity, 0.0)
+
+            return min(9.5, max(4.0, base_score))
+
+        except Exception as e:
+            logging.warning(f"Failed to calculate code quality: {e}")
+            return 6.0
+
+    def _create_implementation_prompt(self, task: FileTask, context: Dict[str, Any]) -> str:
+        """AutoGen용 구현 프롬프트 생성"""
+        spec_config = self.specializations[self.specialization]
+
+        return f"""
+Implement the following Python file with focus on {spec_config["focus"]}:
+
+File: {task.name}
+Description: {task.description}
+Complexity: {task.complexity}
+Quality Target: {task.quality_target.value}
+File Type: {task.file_type.value}
+
+Project Context: {context.get('requirements', 'General Python application')}
+
+Requirements:
+- Write complete, functional Python code
+- Include proper imports, classes, and functions
+- Add comprehensive docstrings and comments
+- Include error handling and logging
+- Follow Python best practices
+- Pay special attention to {spec_config["focus"]} aspects
+- Make the code production-ready and realistic
+
+Respond with ONLY the complete Python code in a ```python code block.
+"""
+
+    def _extract_code_from_response(self, chat_result) -> str:
+        """AutoGen 응답에서 코드 추출"""
+        try:
+            last_message = chat_result.chat_history[-1]["content"]
+
+            if "```python" in last_message:
+                code = last_message.split("```python")[1].split("```")[0].strip()
+            elif "```" in last_message:
+                code = last_message.split("```")[1].split("```")[0].strip()
+            else:
+                code = last_message.strip()
+
+            return code if code else "# Generated code placeholder"
+
+        except Exception as e:
+            logging.error(f"Failed to extract code from AutoGen response: {e}")
+            return "# Error extracting code"
     
     def _get_processing_time(self, complexity: str) -> float:
         """복잡도별 기본 처리 시간"""
@@ -245,45 +388,84 @@ class SelectiveMoAProcessor:
     
     def __init__(self):
         self.processed_files = 0
-        
-        # MoA용 전문 관점들
-        self.perspectives = [
-            {"name": "performance", "focus": "성능 최적화", "weight": 0.3},
-            {"name": "maintainability", "focus": "유지보수성", "weight": 0.4},
-            {"name": "security", "focus": "보안성", "weight": 0.3}
-        ]
+
+        # AutoGen 기반 MoA 전문 관점들
+        self.perspective_agents = self._create_perspective_agents()
+    
+    def _create_perspective_agents(self) -> Dict[str, AssistantAgent]:
+        """각 관점별 AutoGen AssistantAgent 생성"""
+        perspectives = {
+            "performance": {
+                "focus": "성능 최적화",
+                "weight": 0.3,
+                "system_message": """You are a performance optimization expert.
+Focus on making code fast, efficient, and scalable. Consider algorithms, data structures, and resource usage."""
+            },
+            "maintainability": {
+                "focus": "유지보수성",
+                "weight": 0.4,
+                "system_message": """You are a code maintainability expert.
+Focus on clean code, readability, documentation, and long-term maintainability."""
+            },
+            "security": {
+                "focus": "보안성",
+                "weight": 0.3,
+                "system_message": """You are a security expert.
+Focus on secure coding practices, input validation, authentication, and vulnerability prevention."""
+            }
+        }
+
+        agents = {}
+        for name, config in perspectives.items():
+            agent = AssistantAgent(
+                name=f"MoA_{name.title()}Agent",
+                system_message=config["system_message"],
+                llm_config={
+                    "config_list": [
+                        {
+                            "model": "gemini-2.5-flash-lite",
+                            "api_key": os.getenv("GOOGLE_API_KEY"),
+                            "api_type": "google",
+                            "client_host": "https://generativelanguage.googleapis.com"
+                        }
+                    ],
+                    "temperature": 0.7,
+                    "timeout": 120,
+                }
+            )
+            agents[name] = agent
+
+        return agents
     
     async def generate_with_moa(
         self, 
         task: FileTask, 
         context: Dict[str, Any]
     ) -> GenerationResult:
-        """MoA 패턴으로 고품질 생성"""
-        
+        """실제 AutoGen MoA 패턴으로 고품질 생성"""
+
         print(f"  [MoA] 🎭 High-quality generation for {task.name}")
         start_time = time.time()
-        
+
         try:
-            # Layer 1: 다중 관점 생성
-            perspective_results = await self._generate_multiple_perspectives(task, context)
-            
-            # Layer 2: 최적 합성
-            synthesized_content = await self._synthesize_best_implementation(
-                task, perspective_results
-            )
-            
+            # 다중 관점 생성
+            perspective_results = await self._generate_multiple_perspectives_autogen(task, context)
+
+            # 최적 합성
+            synthesized_content = await self._synthesize_best_implementation_autogen(task, perspective_results)
+
             # 품질 점수 (MoA는 더 높은 품질)
-            base_quality = random.uniform(8.5, 9.8)
-            quality_score = min(10.0, base_quality + 0.2)  # MoA 보너스
-            
+            base_quality = self._calculate_moa_quality(synthesized_content, perspective_results)
+            quality_score = min(10.0, base_quality + 0.3)  # MoA 보너스
+
             processing_time = time.time() - start_time
             lines_of_code = len(synthesized_content.split('\n'))
-            
+
             print(f"  [MoA] ✨ Synthesized {task.name} "
                   f"({processing_time:.1f}s, Q:{quality_score:.1f}, {lines_of_code} lines)")
-            
+
             self.processed_files += 1
-            
+
             return GenerationResult(
                 file_name=task.name,
                 content=synthesized_content,
@@ -293,13 +475,13 @@ class SelectiveMoAProcessor:
                 lines_of_code=lines_of_code,
                 success=True
             )
-            
+
         except Exception as e:
             processing_time = time.time() - start_time
             error_msg = str(e)
-            
+
             print(f"  [MoA] ❌ Failed {task.name}: {error_msg}")
-            
+
             return GenerationResult(
                 file_name=task.name,
                 content="",
@@ -310,150 +492,187 @@ class SelectiveMoAProcessor:
                 success=False,
                 error=error_msg
             )
+
+    def _calculate_moa_quality(self, code: str, perspective_results: List[Dict[str, Any]]) -> float:
+        """MoA 생성 코드의 품질 점수 계산"""
+        try:
+            base_score = self._calculate_code_quality(code, "complex")  # 기본 품질 계산
+
+            # 관점 다양성 보너스
+            successful_perspectives = len([r for r in perspective_results if r.get('success', False)])
+            diversity_bonus = min(1.0, successful_perspectives * 0.2)
+
+            # 합성 품질 보너스 (여러 관점이 잘 통합되었는지)
+            has_multiple_aspects = (
+                ('class ' in code and 'def ' in code) or  # 구조적 다양성
+                ('try:' in code and 'logging' in code) or  # 에러 처리 + 로깅
+                ('import ' in code and '"""' in code)  # 임포트 + 문서화
+            )
+            synthesis_bonus = 0.5 if has_multiple_aspects else 0.0
+
+            return min(9.8, base_score + diversity_bonus + synthesis_bonus)
+
+        except Exception as e:
+            logging.warning(f"Failed to calculate MoA quality: {e}")
+            return 8.0
     
-    async def _generate_multiple_perspectives(
+    async def _generate_multiple_perspectives_autogen(
         self, 
         task: FileTask, 
         context: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
-        """다중 관점으로 생성"""
-        
-        # 각 관점별로 생성 (병렬)
-        perspective_tasks = [
-            self._generate_perspective_implementation(task, context, perspective)
-            for perspective in self.perspectives
-        ]
-        
+        """AutoGen을 사용한 다중 관점 생성"""
+
+        prompt = self._create_moa_prompt(task, context)
+
+        # 각 관점별 병렬 생성
+        perspective_tasks = []
+        for name, agent in self.perspective_agents.items():
+            task_coro = self._generate_perspective_with_agent(name, agent, prompt)
+            perspective_tasks.append(task_coro)
+
         results = await asyncio.gather(*perspective_tasks)
         return results
-    
-    async def _generate_perspective_implementation(
+
+    async def _generate_perspective_with_agent(
         self, 
-        task: FileTask, 
-        context: Dict[str, Any], 
-        perspective: Dict[str, Any]
+        perspective_name: str, 
+        agent: AssistantAgent, 
+        prompt: str
     ) -> Dict[str, Any]:
-        """특정 관점으로 구현 생성"""
-        
-        # 관점별 처리 시간
-        await asyncio.sleep(0.8 + random.uniform(0.2, 0.5))
-        
-        focus = perspective["focus"]
-        perspective_name = perspective["name"]
-        
-        # 관점별 템플릿
-        content = f'''"""
-{task.description}
+        """특정 관점으로 AutoGen 생성"""
 
-Perspective: {focus}
-Approach: {perspective_name.title()}-focused implementation
-"""
+        try:
+            user_proxy = UserProxyAgent(
+                name=f"UserProxy_{perspective_name}",
+                code_execution_config=False,
+                human_input_mode="NEVER"
+            )
 
-class {self._extract_class_name(task.name)}:
-    """
-    {task.description}
-    
-    Implementation Focus: {focus}
-    """
-    
-    def __init__(self):
-        # {focus} 중심 설계
-        self.{perspective_name}_optimized = True
-    
-    def core_functionality(self):
-        """핵심 기능 - {focus} 최적화"""
-        # {focus}를 위한 특별한 구현
-        pass
-    
-    def {perspective_name}_specific_method(self):
-        """{focus} 전용 메서드"""
-        # {perspective_name} 관점의 특화된 로직
-        pass
-'''
-        
-        return {
-            "perspective": perspective_name,
-            "focus": focus,
-            "content": content,
-            "quality_estimate": random.uniform(8.0, 9.5),
-            "strengths": [f"Excellent {focus}", f"Optimized for {perspective_name}"],
-            "areas_for_improvement": ["Could be more balanced", "May need other perspectives"]
-        }
-    
-    async def _synthesize_best_implementation(
+            chat_result = await user_proxy.a_initiate_chat(
+                agent,
+                message=prompt,
+                max_turns=1
+            )
+
+            content = self._extract_code_from_response(chat_result)
+
+            return {
+                "perspective": perspective_name,
+                "content": content,
+                "quality_estimate": random.uniform(8.0, 9.5),
+                "success": True
+            }
+
+        except Exception as e:
+            return {
+                "perspective": perspective_name,
+                "content": f"# Error in {perspective_name} perspective: {str(e)}",
+                "quality_estimate": 0.0,
+                "success": False,
+                "error": str(e)
+            }
+
+    async def _synthesize_best_implementation_autogen(
         self, 
         task: FileTask, 
         perspective_results: List[Dict[str, Any]]
     ) -> str:
-        """최적 구현 합성"""
-        
-        # 합성 시간
-        await asyncio.sleep(0.5)
-        
-        # 가장 좋은 관점을 베이스로
-        best_perspective = max(perspective_results, key=lambda x: x["quality_estimate"])
-        
-        synthesized = f'''"""
-{task.description}
+        """AutoGen Synthesizer를 사용한 최적 구현 합성"""
 
-SYNTHESIZED IMPLEMENTATION
-Combining best practices from: {', '.join([r["perspective"] for r in perspective_results])}
+        # Synthesizer Agent 생성
+        synthesizer = AssistantAgent(
+            name="MoA_Synthesizer",
+            system_message="""You are an expert code synthesizer.
+Combine multiple code implementations from different perspectives into one optimal solution.
+Maintain the best aspects of each approach while creating cohesive, high-quality code.""",
+            llm_config={
+                "config_list": [
+                    {
+                        "model": "gemini-2.5-flash-lite",
+                        "api_key": os.getenv("GOOGLE_API_KEY"),
+                        "api_type": "google",
+                        "client_host": "https://generativelanguage.googleapis.com"
+                    }
+                ],
+                "temperature": 0.7,
+                "timeout": 120,
+            }
+        )
 
-Base approach: {best_perspective["focus"]}
-Enhanced with insights from all perspectives
+        # 합성 프롬프트 생성
+        synthesis_prompt = self._create_synthesis_prompt(task, perspective_results)
+
+        user_proxy = UserProxyAgent(
+            name="Synthesis_UserProxy",
+            code_execution_config=False,
+            human_input_mode="NEVER"
+        )
+
+        chat_result = await user_proxy.a_initiate_chat(
+            synthesizer,
+            message=synthesis_prompt,
+            max_turns=1
+        )
+
+        return self._extract_code_from_response(chat_result)
+    
+    def _create_moa_prompt(self, task: FileTask, context: Dict[str, Any]) -> str:
+        """MoA용 프롬프트 생성"""
+        return f"""
+Implement the following Python file from your specialized perspective:
+
+File: {task.name}
+Description: {task.description}
+Complexity: {task.complexity}
+Quality Target: {task.quality_target.value}
+
+Project Context: {context.get('requirements', 'General Python application')}
+
+Focus on your area of expertise and provide the best implementation from your perspective.
+
+Respond with ONLY the complete Python code in a ```python code block.
 """
 
-class {self._extract_class_name(task.name)}:
-    """
-    {task.description}
-    
-    High-quality implementation synthesized from multiple expert perspectives:
-    - {perspective_results[0]["focus"]}
-    - {perspective_results[1]["focus"]} 
-    - {perspective_results[2]["focus"]}
-    """
-    
-    def __init__(self):
-        """통합된 초기화 로직"""
-        # 모든 관점을 고려한 최적 설계
-        self.performance_optimized = True
-        self.maintainable_structure = True
-        self.security_compliant = True
-    
-    def core_functionality(self):
-        """핵심 기능 - 다관점 최적화"""
-        # 성능, 유지보수성, 보안성을 모두 고려한 구현
-        pass
-    
-    def performance_critical_method(self):
-        """성능 중요 메서드"""
-        # 성능 최적화된 로직
-        pass
-    
-    def maintainable_helper(self):
-        """유지보수 친화적 헬퍼"""
-        # 깨끗하고 이해하기 쉬운 로직
-        pass
-    
-    def secure_operation(self):
-        """보안 처리"""
-        # 안전하고 검증된 로직
-        pass
-    
-    def integrated_workflow(self):
-        """통합 워크플로우"""
-        # 모든 관점의 장점을 결합한 완전한 구현
+    def _create_synthesis_prompt(self, task: FileTask, perspective_results: List[Dict[str, Any]]) -> str:
+        """합성용 프롬프트 생성"""
+        perspectives_text = "\n\n".join([
+            f"=== {r['perspective'].upper()} PERSPECTIVE ===\n{r['content']}"
+            for r in perspective_results if r['success']
+        ])
+
+        return f"""
+Synthesize the following implementations from different expert perspectives into one optimal solution:
+
+File: {task.name}
+Description: {task.description}
+
+PERSPECTIVE IMPLEMENTATIONS:
+{perspectives_text}
+
+Create a cohesive, high-quality implementation that combines the best aspects of all perspectives.
+Maintain clean code structure, proper documentation, and production-ready quality.
+
+Respond with ONLY the complete Python code in a ```python code block.
+"""
+
+    def _extract_code_from_response(self, chat_result) -> str:
+        """AutoGen 응답에서 코드 추출"""
         try:
-            self.performance_critical_method()
-            self.maintainable_helper() 
-            self.secure_operation()
+            last_message = chat_result.chat_history[-1]["content"]
+
+            if "```python" in last_message:
+                code = last_message.split("```python")[1].split("```")[0].strip()
+            elif "```" in last_message:
+                code = last_message.split("```")[1].split("```")[0].strip()
+            else:
+                code = last_message.strip()
+
+            return code if code else "# Generated code placeholder"
+
         except Exception as e:
-            # 모든 관점을 고려한 에러 처리
-            logging.error(f"Integrated workflow error: {{e}}")
-            raise
-'''
-        
-        return synthesized
+            logging.error(f"Failed to extract code from AutoGen response: {e}")
+            return "# Error extracting code"
     
     def _extract_class_name(self, file_name: str) -> str:
         """파일명에서 클래스명 추출"""
@@ -686,21 +905,15 @@ class EnhancedActorCriticTeam:
 async def main():
     """Enhanced Actor-Critic 데모"""
     
-    # 테스트용 파일 작업들
+    # 테스트용 파일 작업들 (실제 API 테스트용으로 4개만)
     test_tasks = [
-        # 중요한 파일들 (MoA 처리)
+        # 중요한 파일 (MoA 처리)
         FileTask("services/auth_service.py", "Authentication service", "complex", FileType.CRITICAL, 5, QualityLevel.PREMIUM),
-        FileTask("controllers/user_controller.py", "User API controller", "complex", FileType.CRITICAL, 4, QualityLevel.ENHANCED),
-        FileTask("managers/payment_manager.py", "Payment processing", "critical", FileType.CRITICAL, 5, QualityLevel.PREMIUM),
         
         # 일반 파일들 (Worker 처리)
         FileTask("models/user.py", "User data model", "medium", FileType.STANDARD, 2, QualityLevel.BASIC),
         FileTask("utils/helpers.py", "Helper utilities", "simple", FileType.UTILITY, 1, QualityLevel.BASIC),
         FileTask("validators/input.py", "Input validators", "simple", FileType.STANDARD, 1, QualityLevel.BASIC),
-        FileTask("handlers/event.py", "Event handlers", "medium", FileType.IMPORTANT, 3, QualityLevel.ENHANCED),
-        FileTask("middleware/cors.py", "CORS middleware", "simple", FileType.UTILITY, 1, QualityLevel.BASIC),
-        FileTask("processors/data.py", "Data processors", "medium", FileType.STANDARD, 2, QualityLevel.BASIC),
-        FileTask("connectors/database.py", "Database connections", "medium", FileType.IMPORTANT, 3, QualityLevel.ENHANCED)
     ]
     
     print("=== Enhanced Actor-Critic Team Demo ===")

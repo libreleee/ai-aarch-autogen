@@ -23,7 +23,7 @@ if sys.platform == 'win32':
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # .env 파일 로드 (프로젝트 루트의 .env만 사용)
-project_root = Path(__file__).parent
+project_root = Path(__file__).parent.parent.parent  # 워크스페이스 루트로 이동
 env_path = project_root / ".env"
 load_dotenv(dotenv_path=env_path, override=True)
 

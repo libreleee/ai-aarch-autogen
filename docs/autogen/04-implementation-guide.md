@@ -416,10 +416,32 @@ class AutoGenIntegration:
     def setup_autogen_agents(self):
         """AutoGen 에이전트 설정"""
         
+        # Prefer Google Gemini for this example. If an OpenAI API key is present
+        # we stop and ask the user to switch to GOOGLE_API_KEY to avoid accidental
+        # usage of the OpenAI-hosted models in this guide.
+        openai_key = os.getenv("OPENAI_API_KEY")
+        google_key = os.getenv("GOOGLE_API_KEY")
+
+        if openai_key and not google_key:
+            raise RuntimeError(
+                "Detected OPENAI_API_KEY in environment. This example uses Google "
+                "Gemini (set GOOGLE_API_KEY) — please remove OPENAI_API_KEY or set "
+                "GOOGLE_API_KEY to continue."
+            )
+
+        if not google_key:
+            raise RuntimeError(
+                "GOOGLE_API_KEY is required for this AutoGen example. Set the "
+                "environment variable GOOGLE_API_KEY with your Google API key."
+            )
+
+        # Configure Gemini / Google LLM usage
         config_list = [
             {
-                "model": "gpt-4",
-                "api_key": os.getenv("OPENAI_API_KEY")
+                "model": "gemini-2.5-flash-lite",
+                "api_type": "google",
+                "api_key": google_key,
+                "client_host": "https://generativelanguage.googleapis.com"
             }
         ]
         

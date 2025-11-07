@@ -15,6 +15,14 @@ from typing import Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor
 import json
 
+# AutoGen 통합
+try:
+    from autogen import AssistantAgent
+    AUTOGEN_AVAILABLE = True
+except ImportError:
+    AUTOGEN_AVAILABLE = False
+    print("Warning: AutoGen not available. Install with: pip install autogen")
+
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
@@ -65,6 +73,25 @@ class TCPWorkerAgent:
         self.processed_tasks = 0
         self.start_time = time.time()
         self.logger = logging.getLogger(f"TCPWorkerAgent-{worker_id}")
+        
+        # AutoGen AssistantAgent 초기화
+        if AUTOGEN_AVAILABLE:
+            self.agent = AssistantAgent(
+                name=f"Worker_{worker_id}",
+                system_message=f"""You are a specialized coding assistant (Worker {worker_id}).
+You excel at generating high-quality Python code for various tasks.
+Always provide complete, runnable code with proper imports and documentation.
+Focus on clean, maintainable code that follows Python best practices.""",
+                llm_config={
+                    "model": "gemini-2.5-flash-lite",
+                    "api_type": "google",
+                    "client_host": "https://generativelanguage.googleapis.com"
+                }
+            )
+            self.logger.info(f"AutoGen AssistantAgent initialized for Worker {worker_id}")
+        else:
+            self.agent = None
+            self.logger.warning(f"AutoGen not available for Worker {worker_id}")
 
     async def process_task(self, task: WorkerTask) -> Dict:
         """
@@ -149,9 +176,34 @@ class TCPWorkerAgent:
                     'worker_id': self.worker_id,
                     'uptime': time.time() - self.start_time,
                     'processed_tasks': self.processed_tasks,
+                    'autogen_available': AUTOGEN_AVAILABLE,
                     'timestamp': time.time()
                 }
                 await self._send_json_message(client.socket, status_info)
+
+            elif message.get('type') == 'generate_code' and self.agent:
+                # AutoGen을 통한 코드 생성
+                result = await self._generate_code_with_autogen(message)
+                response = {
+                    'type': 'code_generated',
+                    'task_id': message.get('task_id'),
+                    'code': result.get('code'),
+                    'quality_score': result.get('quality_score', 0),
+                    'worker_id': self.worker_id,
+                    'timestamp': time.time()
+                }
+                await self._send_json_message(client.socket, response)
+
+            elif message.get('type') == 'generate_code' and not self.agent:
+                # AutoGen 미사용 시 에러 응답
+                error_response = {
+                    'type': 'error',
+                    'message': 'AutoGen not available on this worker',
+                    'task_id': message.get('task_id'),
+                    'worker_id': self.worker_id,
+                    'timestamp': time.time()
+                }
+                await self._send_json_message(client.socket, error_response)
 
             else:
                 # 알 수 없는 메시지 타입
@@ -213,15 +265,102 @@ class TCPWorkerAgent:
             self.logger.error(f"Failed to send JSON message: {e}")
             raise
 
-    async def _send_raw_message(self, client_socket: socket.socket, data: bytes):
-        """원시 데이터를 클라이언트에게 전송"""
+    async def _generate_code_with_autogen(self, message: dict) -> Dict:
+        """AutoGen을 사용하여 코드 생성"""
+        if not self.agent:
+            return {'error': 'AutoGen not available'}
+
+        prompt = message.get('prompt', '')
+        task_id = message.get('task_id', 'unknown')
+
         try:
-            # 메시지 길이를 먼저 전송
-            length = len(data).to_bytes(4, byteorder='big')
-            client_socket.send(length + data)
+            self.logger.info(f"Generating code for task {task_id} with AutoGen")
+
+            # AutoGen을 통한 코드 생성
+            # 실제로는 UserProxyAgent와의 대화가 필요하지만, 여기서는 직접 호출
+            code_prompt = f"""
+Generate Python code for the following requirement:
+
+{prompt}
+
+Requirements:
+- Provide complete, runnable Python code
+- Include proper imports
+- Add docstrings and comments
+- Follow Python best practices
+- Make the code production-ready
+
+Return only the Python code in a code block:
+```python
+# Your code here
+```
+"""
+
+            # AutoGen generate_reply 사용 (비동기)
+            response = await self.agent.generate_reply(code_prompt)
+            
+            # 응답에서 코드 추출
+            generated_code = self._extract_code_from_response(response)
+            
+            # 코드 품질 평가 (간단한 휴리스틱)
+            quality_score = self._evaluate_code_quality(generated_code)
+            
+            self.logger.info(f"Code generated for task {task_id}, quality: {quality_score}/10")
+            
+            return {
+                'code': generated_code,
+                'quality_score': quality_score,
+                'task_id': task_id
+            }
+
         except Exception as e:
-            self.logger.error(f"Failed to send raw message: {e}")
-            raise
+            self.logger.error(f"Error generating code with AutoGen: {e}")
+            return {'error': str(e), 'task_id': task_id}
+
+    def _extract_code_from_response(self, response) -> str:
+        """AutoGen 응답에서 코드 추출"""
+        if isinstance(response, str):
+            content = response
+        elif hasattr(response, 'content'):
+            content = response.content
+        else:
+            content = str(response)
+        
+        # 코드 블록에서 추출
+        import re
+        code_match = re.search(r'```python\s*\n(.*?)\n```', content, re.DOTALL)
+        if code_match:
+            return code_match.group(1).strip()
+        
+        # 코드 블록 없이도 코드가 있을 수 있음
+        return content.strip()
+
+    def _evaluate_code_quality(self, code: str) -> float:
+        """코드 품질 평가 (간단한 점수화)"""
+        score = 5.0  # 기본 점수
+        
+        # 길이 기반 점수
+        if len(code) > 100:
+            score += 1
+        if len(code) > 500:
+            score += 1
+        
+        # 구조적 요소 확인
+        if 'import ' in code:
+            score += 0.5
+        if 'def ' in code:
+            score += 0.5
+        if 'class ' in code:
+            score += 0.5
+        if '"""' in code or "'''" in code:
+            score += 0.5
+        if 'try:' in code:
+            score += 0.5
+        if 'except:' in code:
+            score += 0.5
+        
+        # 최대 10점
+        return min(score, 10.0)
 
     def get_stats(self) -> Dict:
         """Worker의 현재 통계 정보"""

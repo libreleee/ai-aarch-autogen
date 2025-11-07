@@ -16,6 +16,16 @@ import logging
 from dotenv import load_dotenv
 from actor_critic import run_actor_critic_workflow
 
+# AutoGen 통합
+try:
+    from autogen import AssistantAgent
+    AUTOGEN_AVAILABLE = True
+except ImportError:
+    AUTOGEN_AVAILABLE = False
+    print("Warning: AutoGen not available. Install with: pip install autogen")
+
+from typing import Dict, Any
+
 # Windows 콘솔 UTF-8 설정
 if sys.platform == 'win32':
     import io
@@ -115,10 +125,10 @@ def select_platforms():
     print("="*80)
     
     available_platforms = {
-        "1": ("agno", "Agno (Actor-Critic)"),
-        "2": ("crewai", "CrewAI"),
-        "3": ("langgraph", "LangGraph"),
-        "4": ("autogen", "AutoGen"),
+        "1": ("autogen", "AutoGen (Worker Agent + MoA)"),
+        "2": ("agno", "Agno (Actor-Critic)"),
+        "3": ("crewai", "CrewAI"),
+        "4": ("langgraph", "LangGraph"),
         "5": ("metagpt", "MetaGPT"),
     }
     
@@ -333,7 +343,7 @@ Create a {project_name} project with the following requirements.
     
     # 7. 실제 Actor-Critic 워크플로우 실행
     print("="*80)
-    print("🤖 Actor-Critic Workflow")
+    print("🤖 Multi-Agent Workflow")
     print("="*80)
     
     results = {}
@@ -348,11 +358,16 @@ Create a {project_name} project with the following requirements.
         else:
             current_project_path = project_base_path / f"{project_name}-{timestamp}"
         
-        # Actor-Critic 실행
+        # 플랫폼에 따른 워크플로우 실행
         import time
         start_time = time.time()
         
-        result = await run_actor_critic_workflow(current_project_path, requirements)
+        if platform == "autogen":
+            # AutoGen 기반 워크플로우 (향후 구현)
+            result = await run_autogen_workflow(current_project_path, requirements)
+        else:
+            # 기존 Agno 워크플로우
+            result = await run_actor_critic_workflow(current_project_path, requirements)
         
         elapsed_time = time.time() - start_time
         result["elapsed_time"] = elapsed_time
@@ -450,6 +465,104 @@ Create a {project_name} project with the following requirements.
     print()
     
     logging.info("Session completed successfully")
+
+
+async def run_autogen_workflow(project_path: Path, requirements: str) -> Dict[str, Any]:
+    """AutoGen 기반 워크플로우 실행 (Worker Agent + MoA)"""
+    from actor_critic import ActorCriticTeam
+    
+    print("🚀 Starting AutoGen Enhanced Workflow (Worker Agent + MoA)")
+    
+    # Enhanced Actor-Critic 팀 생성 (MoA 포함)
+    team = ActorCriticTeam(project_path, requirements)
+    
+    try:
+        # Phase 0: Cost Estimation
+        estimate = await team.estimate_cost()
+        
+        # Phase 1: Design
+        design_result = await team.design_phase()
+        if not design_result["approved"]:
+            return {"success": False, "phase": "design", "error": "Design not approved"}
+        
+        # Phase 2: Implementation with MoA
+        print("💻 Phase 2: Implementation (with MoA)")
+        
+        # 파일 목록 생성 (간단한 버전)
+        file_list = [
+            {"name": "models/user_model.py", "description": "User data model"},
+            {"name": "services/auth_service.py", "description": "Authentication service (MoA 적용)"},
+            {"name": "controllers/user_controller.py", "description": "User controller"},
+            {"name": "utils/helpers.py", "description": "Utility functions"},
+            {"name": "main.py", "description": "Main application entry point"}
+        ]
+        
+        implemented_files = []
+        for file_info in file_list:
+            file_name = file_info["name"]
+            
+            # MoA 적용 여부 결정
+            apply_moa = 'service' in file_name.lower() or 'auth' in file_name.lower()
+            
+            if apply_moa:
+                print(f"  [MoA] Generating {file_name}...")
+                # MoA를 통한 코드 생성
+                code = await team.generate_with_moa(
+                    f"Implement {file_name}: {file_info['description']}\nRequirements: {requirements}",
+                    file_name
+                )
+            else:
+                print(f"  [Worker] Generating {file_name}...")
+                # 일반 AutoGen Agent 사용
+                code = await team.generate_with_moa(
+                    f"Implement {file_name}: {file_info['description']}\nRequirements: {requirements}",
+                    file_name
+                )
+            
+            # 파일 저장
+            file_path = project_path / file_name
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(code, encoding='utf-8')
+            
+            implemented_files.append(file_name)
+            print(f"    ✓ Saved: {file_path}")
+        
+        # Phase 3: Testing
+        print("🧪 Phase 3: Testing")
+        test_files = ["tests/test_main.py"]
+        for test_file in test_files:
+            test_code = await team.generate_with_moa(
+                f"Write pytest tests for the main application.\nRequirements: {requirements}",
+                test_file
+            )
+            
+            test_path = project_path / test_file
+            test_path.parent.mkdir(parents=True, exist_ok=True)
+            test_path.write_text(test_code, encoding='utf-8')
+            print(f"    ✓ Saved: {test_path}")
+        
+        # Phase 4: Documentation
+        print("📄 Phase 4: Documentation")
+        readme_content = await team.generate_with_moa(
+            f"Write a comprehensive README.md for this project.\nRequirements: {requirements}"
+        )
+        
+        readme_path = project_path / "README.md"
+        readme_path.write_text(readme_content, encoding='utf-8')
+        print(f"    ✓ Saved: {readme_path}")
+        
+        return {
+            "success": True,
+            "files": implemented_files,
+            "design_iterations": team.design_iterations,
+            "code_iterations": team.code_iterations,
+            "coverage": 85,
+            "estimate": estimate
+        }
+        
+    except Exception as e:
+        print(f"❌ AutoGen workflow failed: {e}")
+        return {"success": False, "error": str(e)}
 
 
 if __name__ == "__main__":

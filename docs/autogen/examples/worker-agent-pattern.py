@@ -12,6 +12,11 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 from dataclasses import dataclass
 import random
+import os
+
+# AutoGen 패키지 import
+import autogen
+from autogen import AssistantAgent, UserProxyAgent, GroupChat, GroupChatManager
 
 
 @dataclass
@@ -38,56 +43,113 @@ class WorkerResult:
 
 
 class WorkerAgent:
-    """개별 Worker Agent"""
-    
+    """AutoGen 기반 Worker Agent"""
+
     def __init__(self, worker_id: int, specialization: str = "general"):
         self.worker_id = worker_id
         self.specialization = specialization
         self.tasks_completed = 0
         self.total_time = 0.0
         self.success_rate = 1.0
-        
+
+        # AutoGen AssistantAgent 생성
+        system_message = self._get_system_message()
+        self.agent = AssistantAgent(
+            name=f"Worker_{worker_id}_{specialization}",
+            system_message=system_message,
+            llm_config={
+                "config_list": [
+                    {
+                        "model": "gemini-2.5-flash-lite",
+                        "api_key": os.getenv("GOOGLE_API_KEY"),
+                        "api_type": "google",
+                        "client_host": "https://generativelanguage.googleapis.com"
+                    }
+                ],
+                "temperature": 0.7,
+                "timeout": 120,
+            }
+        )
+
+        # UserProxyAgent for task execution
+        self.user_proxy = UserProxyAgent(
+            name=f"UserProxy_{worker_id}",
+            code_execution_config=False,  # 코드 실행 비활성화 (시뮬레이션용)
+            human_input_mode="NEVER"
+        )
+
         # Worker별 특성화
         self.specializations = {
             "performance": {"speed_boost": 1.2, "quality_bonus": 0.1},
             "quality": {"speed_boost": 0.8, "quality_bonus": 0.3},
             "general": {"speed_boost": 1.0, "quality_bonus": 0.0}
         }
+
+    def _get_system_message(self) -> str:
+        """Worker별 시스템 메시지"""
+        base_message = f"""You are Worker-{self.worker_id}, a specialized {self.specialization} developer.
+
+Your role is to implement code files according to specifications.
+Focus on {self.specialization} aspects of development.
+
+Guidelines:
+- Write clean, well-documented Python code
+- Include proper error handling
+- Add docstrings for all functions and classes
+- Follow Python best practices
+- Generate realistic, functional code (not just stubs)
+
+When given a task, respond with complete, runnable Python code in a code block.
+"""
+
+        if self.specialization == "performance":
+            base_message += "\nSpecial focus: Optimize for performance, use efficient algorithms and data structures."
+        elif self.specialization == "quality":
+            base_message += "\nSpecial focus: Emphasize code quality, maintainability, and comprehensive error handling."
+        elif self.specialization == "general":
+            base_message += "\nSpecial focus: Provide balanced, general-purpose implementations."
+
+        return base_message
     
     async def execute_task(self, task: WorkerTask) -> WorkerResult:
-        """작업 실행"""
-        
+        """실제 AutoGen API 호출로 작업 실행"""
+
         start_time = time.time()
-        
+
         print(f"    [Worker-{self.worker_id}] 🔄 Starting {task.file_name}")
-        
+
         try:
-            # 특성화에 따른 처리 시간 조정
-            spec_config = self.specializations.get(self.specialization, self.specializations["general"])
-            
-            base_time = self._get_base_processing_time(task.complexity)
-            actual_time = base_time / spec_config["speed_boost"]
-            
-            # 작업 시뮬레이션
-            await asyncio.sleep(actual_time)
-            
-            # 가끔 실패 시뮬레이션 (5% 확률)
-            if random.random() < 0.05:
-                raise Exception(f"Random failure in {task.file_name}")
-            
-            # 결과 생성
+            # AutoGen 프롬프트 생성
+            prompt = self._create_implementation_prompt(task)
+
+            # 실제 AutoGen API 호출
+            chat_result = self.user_proxy.initiate_chat(
+                self.agent,
+                message=prompt,
+                max_turns=1  # 단일 응답만 받음
+            )
+
+            # 응답에서 코드 추출
+            generated_code = self._extract_code_from_response(chat_result)
+
+            # 특성화에 따른 처리 시간 조정 (실제 API 호출 시간 사용)
             processing_time = time.time() - start_time
-            lines_generated = random.randint(50, 200)
-            base_quality = random.uniform(7.0, 9.0)
+
+            # 코드 분석으로 품질 점수 계산
+            lines_generated = len(generated_code.split('\n'))
+            base_quality = self._calculate_code_quality(generated_code, task.complexity)
+
+            # 특성화 보너스 적용
+            spec_config = self.specializations.get(self.specialization, self.specializations["general"])
             quality_score = min(10.0, base_quality + spec_config["quality_bonus"])
-            
+
             # 통계 업데이트
             self.tasks_completed += 1
             self.total_time += processing_time
-            
+
             print(f"    [Worker-{self.worker_id}] ✅ Completed {task.file_name} "
-                  f"({processing_time:.1f}s, Q:{quality_score:.1f})")
-            
+                  f"({processing_time:.1f}s, Q:{quality_score:.1f}, Lines:{lines_generated})")
+
             return WorkerResult(
                 worker_id=self.worker_id,
                 task_id=task.task_id,
@@ -97,13 +159,13 @@ class WorkerAgent:
                 lines_generated=lines_generated,
                 quality_score=quality_score
             )
-            
+
         except Exception as e:
             processing_time = time.time() - start_time
             error_msg = str(e)
-            
+
             print(f"    [Worker-{self.worker_id}] ❌ Failed {task.file_name}: {error_msg}")
-            
+
             return WorkerResult(
                 worker_id=self.worker_id,
                 task_id=task.task_id,
@@ -114,6 +176,95 @@ class WorkerAgent:
                 quality_score=0.0,
                 error=error_msg
             )
+
+    def _calculate_code_quality(self, code: str, complexity: str) -> float:
+        """생성된 코드의 품질 점수 계산"""
+        try:
+            lines = len(code.split('\n'))
+            has_docstrings = '"""' in code or "'''" in code
+            has_error_handling = 'try:' in code and 'except' in code
+            has_imports = 'import ' in code
+            has_functions = 'def ' in code
+            has_classes = 'class ' in code
+
+            # 기본 점수
+            base_score = 6.0
+
+            # 코드 길이 보너스 (적절한 길이)
+            if 20 <= lines <= 150:
+                base_score += 1.0
+            elif lines > 200:
+                base_score -= 0.5
+
+            # 구조적 요소 보너스
+            if has_docstrings:
+                base_score += 0.5
+            if has_error_handling:
+                base_score += 0.5
+            if has_imports:
+                base_score += 0.3
+            if has_functions:
+                base_score += 0.3
+            if has_classes:
+                base_score += 0.4
+
+            # 복잡도별 조정
+            complexity_bonus = {"simple": 0.0, "medium": 0.2, "complex": 0.4, "critical": 0.6}
+            base_score += complexity_bonus.get(complexity, 0.0)
+
+            return min(9.5, max(4.0, base_score))
+
+        except Exception as e:
+            logging.warning(f"Failed to calculate code quality: {e}")
+            return 6.0
+
+    def _create_implementation_prompt(self, task: WorkerTask) -> str:
+        """AutoGen용 구현 프롬프트 생성"""
+        return f"""
+Implement the following Python file:
+
+File: {task.file_name}
+Description: {task.description}
+Complexity: {task.complexity}
+
+Requirements:
+- Write complete, functional Python code
+- Include proper imports, classes, and functions
+- Add comprehensive docstrings
+- Include error handling where appropriate
+- Follow Python best practices
+- Make the code realistic and runnable
+
+Focus on {self.specialization} aspects in your implementation.
+
+Respond with ONLY the complete Python code in a ```python code block.
+"""
+
+    def _extract_code_from_response(self, chat_result) -> str:
+        """AutoGen 응답에서 코드 추출"""
+        try:
+            # ChatResult에서 마지막 응답 메시지 추출
+            if hasattr(chat_result, 'chat_history') and chat_result.chat_history:
+                last_message = chat_result.chat_history[-1]["content"]
+            elif hasattr(chat_result, 'summary'):
+                last_message = chat_result.summary
+            else:
+                # 다른 가능한 구조 확인
+                last_message = str(chat_result)
+
+            # 코드 블록에서 추출
+            if "```python" in last_message:
+                code = last_message.split("```python")[1].split("```")[0].strip()
+            elif "```" in last_message:
+                code = last_message.split("```")[1].split("```")[0].strip()
+            else:
+                code = last_message.strip()
+
+            return code if code else "# Generated code placeholder"
+
+        except Exception as e:
+            logging.error(f"Failed to extract code from AutoGen response: {e}")
+            return "# Error extracting code"
     
     def _get_base_processing_time(self, complexity: str) -> float:
         """복잡도별 기본 처리 시간"""

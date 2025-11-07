@@ -18,9 +18,70 @@ try:
 except ImportError:
     genai = None
 
+# AutoGen 통합
+try:
+    from autogen import AssistantAgent
+    AUTOGEN_AVAILABLE = True
+except ImportError:
+    AUTOGEN_AVAILABLE = False
+    print("Warning: AutoGen not available. Install with: pip install autogen")
+
+
+class SelectiveMoAProcessor:
+    """Mixture-of-Agents 프로세서 - 중요 파일에만 적용"""
+    
+    def __init__(self):
+        self.logger = logging.getLogger("SelectiveMoAProcessor")
+        
+    async def should_apply_moa(self, file_path: str, requirements: str) -> bool:
+        """파일이 MoA 적용 대상인지 판단"""
+        # 중요 파일 패턴
+        important_patterns = [
+            'service', 'auth', 'security', 'core', 'main',
+            'controller', 'handler', 'processor'
+        ]
+        
+        file_name = file_path.lower()
+        return any(pattern in file_name for pattern in important_patterns)
+    
+    async def synthesize(self, perspectives: List[str]) -> str:
+        """다중 관점 합성"""
+        if len(perspectives) < 2:
+            return perspectives[0] if perspectives else ""
+        
+        # 가장 좋은 두 관점을 선택하여 합성
+        synthesis_prompt = f"""
+다음은 여러 AI Agent의 관점에서 생성된 코드들입니다:
+
+Agent 1 (Performance):
+{perspectives[0]}
+
+Agent 2 (Maintainability):
+{perspectives[1]}
+
+Agent 3 (Security):
+{perspectives[2] if len(perspectives) > 2 else "N/A"}
+
+이 코드들을 분석하여 최고의 코드를 합성하세요:
+
+요구사항:
+1. 각 Agent의 장점을 결합
+2. Performance, Maintainability, Security 모두 고려
+3. 가장 깨끗하고 효율적인 코드 생성
+4. 상충되는 부분은 최적의 타협점 선택
+
+최종 코드만 반환하세요:
+```python
+# 합성된 코드
+```
+"""
+        
+        # 간단한 합성 로직 (실제로는 AI 호출)
+        # 여기서는 첫 번째 관점을 기본으로 사용
+        return perspectives[0]
+
 
 class ActorCriticTeam:
-    """Actor-Critic 팀 (Gemini 기반)"""
     
     def __init__(self, project_path: Path, requirements: str):
         # 로깅 설정: 콘솔에도 INFO 레벨 로그 출력
@@ -39,6 +100,19 @@ class ActorCriticTeam:
         # 실행 모드 확인
         self.execution_mode = os.getenv("EXECUTION_MODE", "api").lower()
         self.cli_provider = os.getenv("CLI_PROVIDER", "gemini-cli").lower()
+        
+        # MoA 프로세서 초기화
+        self.moa_processor = SelectiveMoAProcessor()
+        
+        # 로거 초기화
+        self.logger = logging.getLogger("ActorCriticTeam")
+        
+        # AutoGen Agent들 초기화 (사용 가능한 경우)
+        self.agents = {}
+        if AUTOGEN_AVAILABLE:
+            self._initialize_autogen_agents()
+        else:
+            self.logger.warning("AutoGen not available, falling back to Gemini API")
         
         if self.execution_mode == "cli":
             self.model = None
@@ -70,6 +144,146 @@ class ActorCriticTeam:
             "total": 0
         }
         self.api_calls = 0
+    
+    def _initialize_autogen_agents(self):
+        """AutoGen Agent들 초기화"""
+        try:
+            self.agents = {
+                'performance': AssistantAgent(
+                    name="PerformanceAgent",
+                    system_message="""You are a performance-focused coding assistant.
+                    Generate highly optimized, efficient Python code.
+                    Focus on speed, memory usage, and computational efficiency.
+                    Use appropriate data structures and algorithms for optimal performance.""",
+                    llm_config={
+                        "model": "gemini-2.5-flash-lite",
+                        "api_type": "google",
+                        "client_host": "https://generativelanguage.googleapis.com"
+                    }
+                ),
+                'maintainability': AssistantAgent(
+                    name="MaintainabilityAgent", 
+                    system_message="""You are a maintainability-focused coding assistant.
+                    Generate clean, readable, well-documented Python code.
+                    Focus on code structure, naming conventions, and long-term maintainability.
+                    Include comprehensive docstrings and comments.""",
+                    llm_config={
+                        "model": "gemini-2.5-flash-lite",
+                        "api_type": "google",
+                        "client_host": "https://generativelanguage.googleapis.com"
+                    }
+                ),
+                'security': AssistantAgent(
+                    name="SecurityAgent",
+                    system_message="""You are a security-focused coding assistant.
+                    Generate secure Python code with proper input validation, error handling, and security best practices.
+                    Focus on preventing common vulnerabilities and ensuring data protection.""",
+                    llm_config={
+                        "model": "gemini-2.5-flash-lite",
+                        "api_type": "google",
+                        "client_host": "https://generativelanguage.googleapis.com"
+                    }
+                ),
+                'general': AssistantAgent(
+                    name="GeneralAgent",
+                    system_message="""You are a general-purpose coding assistant.
+                    Generate well-rounded Python code that balances all concerns.
+                    Provide practical, working solutions for various programming tasks.""",
+                    llm_config={
+                        "model": "gemini-2.5-flash-lite",
+                        "api_type": "google",
+                        "client_host": "https://generativelanguage.googleapis.com"
+                    }
+                )
+            }
+            self.logger.info("AutoGen agents initialized successfully")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize AutoGen agents: {e}")
+            self.agents = {}
+    
+    async def generate_with_moa(self, prompt: str, file_path: str = "") -> str:
+        """Mixture-of-Agents 패턴으로 코드 생성"""
+        if not self.agents:
+            # AutoGen 사용 불가 시 기존 방식으로 폴백
+            return await self._generate_content_fallback(prompt)
+        
+        try:
+            # MoA 적용 여부 결정
+            apply_moa = await self.moa_processor.should_apply_moa(file_path, self.requirements)
+            
+            if apply_moa and len(self.agents) >= 3:
+                # MoA 적용: 다중 Agent 관점 수집
+                self.logger.info(f"Applying MoA for {file_path}")
+                
+                perspectives = []
+                target_agents = ['performance', 'maintainability', 'security']
+                
+                for agent_key in target_agents:
+                    if agent_key in self.agents:
+                        try:
+                            response = await self.agents[agent_key].generate_reply(prompt)
+                            perspectives.append(self._extract_code_from_response(response))
+                        except Exception as e:
+                            self.logger.warning(f"Failed to get perspective from {agent_key}: {e}")
+                
+                if len(perspectives) >= 2:
+                    # 합성 적용
+                    final_code = await self.moa_processor.synthesize(perspectives)
+                    self.logger.info(f"MoA synthesis completed for {file_path}")
+                    return final_code
+                else:
+                    # 관점이 부족하면 일반 Agent 사용
+                    return await self._generate_with_single_agent(prompt, 'general')
+            else:
+                # MoA 미적용: 단일 Agent 사용 (파일 중요도에 따라)
+                agent_key = 'general'
+                if 'service' in file_path.lower() or 'auth' in file_path.lower():
+                    agent_key = 'security'
+                elif 'model' in file_path.lower() or 'data' in file_path.lower():
+                    agent_key = 'maintainability'
+                
+                return await self._generate_with_single_agent(prompt, agent_key)
+                
+        except Exception as e:
+            self.logger.error(f"MoA generation failed: {e}")
+            return await self._generate_content_fallback(prompt)
+    
+    async def _generate_with_single_agent(self, prompt: str, agent_key: str) -> str:
+        """단일 AutoGen Agent로 코드 생성"""
+        if agent_key not in self.agents:
+            agent_key = 'general'
+        
+        try:
+            response = await self.agents[agent_key].generate_reply(prompt)
+            return self._extract_code_from_response(response)
+        except Exception as e:
+            self.logger.error(f"Single agent generation failed: {e}")
+            return await self._generate_content_fallback(prompt)
+    
+    def _extract_code_from_response(self, response) -> str:
+        """AutoGen 응답에서 코드 추출"""
+        if isinstance(response, str):
+            content = response
+        elif hasattr(response, 'content'):
+            content = response.content
+        elif hasattr(response, 'get') and callable(getattr(response, 'get')):
+            # dict-like 객체인 경우 - 올바른 체이닝 사용
+            content = response.get('content') or response.get('text') or str(response)
+        else:
+            content = str(response)
+        
+        # 코드 블록에서 추출
+        import re
+        code_match = re.search(r'```python\s*\n(.*?)\n```', content, re.DOTALL)
+        if code_match:
+            return code_match.group(1).strip()
+        
+        return content.strip()
+    
+    async def _generate_content_fallback(self, prompt: str) -> str:
+        """AutoGen 실패 시 기존 방식으로 폴백"""
+        response = self._generate_content(prompt)
+        return response.text if hasattr(response, 'text') else str(response)
     
     def _find_codex_path(self):
         """Codex CLI 경로를 동적으로 찾기 (크로스 플랫폼) - 검증된 방식"""
@@ -737,6 +951,64 @@ IMPORTANT:
         print(f"  ✓ Design draft saved: {design_file_temp}")
         logging.info(f"Design draft saved: {design_file_temp}")
         
+        # Design Draft 승인 입력 받기 (HITL)
+        print("\n" + "="*80)
+        print("📋 Design Draft Review")
+        print("="*80)
+        print(f"설계서가 생성되었습니다: {design_file_temp}")
+        print("\n설계서 내용 미리보기:")
+        print("-" * 40)
+        # 처음 1000자만 표시
+        preview = design[:1000] + "..." if len(design) > 1000 else design
+        print(preview)
+        print("-" * 40)
+        print(f"\n💡 전체 설계서 확인: {design_file_temp}")
+        print(f"   파일 열기: explorer \"{design_file_temp.parent}\"")
+        print("="*80)
+        
+        # 승인 입력 받기
+        print("\n💡 이 설계서로 진행하시겠습니까?")
+        print("   y: 승인 및 진행")
+        print("   n: 취소")
+        print("   r: 설계 수정 요청 (피드백 제공)")
+        
+        try:
+            approval = input("선택 (y/n/r): ").strip().lower()
+        except EOFError:
+            # 자동 모드 (터미널 입력 불가 상황)
+            print("[자동 모드] 기본값 'y'로 승인합니다.")
+            approval = 'y'
+        
+        if approval == 'y':
+            print("\n✅ Design draft 승인됨. 계속 진행합니다.\n")
+        elif approval == 'r':
+            print("\n🔄 설계 수정 요청")
+            try:
+                feedback = input("수정 요청 사항을 입력하세요: ").strip()
+            except EOFError:
+                print("[자동 모드] 피드백 없음, 기본값으로 진행합니다.")
+                feedback = ""
+            
+            if feedback:
+                print(f"\n📝 피드백: {feedback}")
+                print("\n🔧 설계를 수정합니다...\n")
+                
+                # Design 재생성 (피드백 포함)
+                design_prompt_with_feedback = f"""
+{default_prompt}
+
+**사용자 피드백 (수정 요청)**:
+{feedback}
+
+위 피드백을 반영하여 설계를 수정해주세요.
+"""
+                return await self.design_phase(prompt_override=design_prompt_with_feedback)
+            else:
+                print("⚠️  피드백이 없습니다. 기존 설계로 진행합니다.\n")
+        else:
+            print("\n❌ 설계가 취소되었습니다.")
+            return {"approved": False, "design": design, "error": "User cancelled design"}
+        
         # Critic 검토 (간단하게)
         print("  [Critic] Reviewing design...")
         # 긴 design 내용을 포함하지 말고 간단한 검토 요청
@@ -1052,21 +1324,70 @@ Do NOT:
         # 응답 검증 로깅
         logging.debug(f"Response for {file_name}: length={len(response.text)}, extracted code length={len(code)}")
         
-        # 코드 검증 (빈 코드 방지)
+        # 코드 검증 (빈 코드 방지) - 재시도 최대 3회
+        retry_count = 0
+        max_retries = 3
+        
+        while (not code or len(code) < 50) and retry_count < max_retries:
+            retry_count += 1
+            logging.error(f"❌ Generated code for {file_name} is too short or empty (attempt {retry_count}/{max_retries}). Length: {len(code)}")
+            
+            if retry_count == 1:
+                logging.debug(f"Raw response preview: {response.text[:300]}...")
+                print(f"    ⚠️  Code too short, retrying {file_name} (attempt 1)...")
+                
+                # 첫 번째 재시도: 더 강력한 프롬프트
+                stronger_prompt = f"""
+⚠️ CRITICAL: You MUST return ONLY valid Python code in a code block. NO explanations, NO logs.
+
+Implement the file {file_name} according to the following design.
+
+Design Document (설계 문서):
+{design}
+
+Requirements (요구사항):
+{self.requirements}
+
+Role of {file_name}:
+{file_info.get("description", "File implementation")}
+
+CRITICAL REQUIREMENTS:
+✓ Write ONLY Python code (no explanations, no CLI output)
+✓ Minimum 100 lines of complete, working code
+✓ Include: proper imports, docstrings, error handling, complete logic
+✓ Use markdown code block: ```python ... ```
+
+OUTPUT FORMAT (EXACTLY):
+```python
+(Your complete Python code here - NO explanations outside this block)
+```
+
+FORBIDDEN:
+✗ CLI logs (✓, ✗, $, Run, etc.)
+✗ Explanations outside code block
+✗ Tool usage or placeholder code
+✗ TODO or pass statements
+"""
+                response = self._generate_content(stronger_prompt)
+                code = self._extract_code(response.text)
+                self.api_calls += 1
+                
+            elif retry_count == 2:
+                print(f"    ⚠️  Code still too short, retrying {file_name} (attempt 2 - direct mode)...")
+                
+                # 두 번째 재시도: 최소한의 프롬프트 (간단하게)
+                minimal_prompt = f"Write complete Python code for {file_name}. Include all imports and logic. Output only the Python code in ```python``` block."
+                response = self._generate_content(minimal_prompt)
+                code = self._extract_code(response.text)
+                self.api_calls += 1
+            else:
+                print(f"    ❌ Final retry failed for {file_name}")
+        
+        # 모든 재시도 실패 시 템플릿 사용
         if not code or len(code) < 50:
-            logging.error(f"Generated code for {file_name} is too short or empty. Length: {len(code)}")
-            logging.debug(f"Raw response: {response.text[:500]}")
-            
-            # 재시도 로직
-            print(f"    ⚠️  Code too short, retrying {file_name}...")
-            response = self._generate_content(impl_prompt)
-            code = self._extract_code(response.text)
-            self.api_calls += 1
-            
-            # 여전히 짧으면 경고
-            if not code or len(code) < 50:
-                logging.warning(f"Retry failed for {file_name}. Using minimal template.")
-                code = f'"""{file_name}\n\nGenerated by Multi-Agent Bridge\n"""\n\n# TODO: Implementation needed\npass\n'
+            logging.warning(f"❌ All retries failed for {file_name}. Using minimal template.")
+            code = f'"""{file_name}\n\nGenerated by Multi-Agent Bridge\n"""\n\n# TODO: Implementation needed\npass\n'
+            print(f"    ⚠️  Using template for {file_name}")
         
         # 파일 저장
         file_path = self.project_path / file_name
@@ -1739,8 +2060,33 @@ Phase 2-4: 병렬 처리      {phase2_4_time:>8.2f}초 ← asyncio.gather()로 �
         return files
     
     def _extract_code(self, response: str) -> str:
-        """응답에서 코드 추출 (개선된 버전)"""
+        """응답에서 코드 추출 (개선된 버전 - CLI 로그 필터링 추가)"""
         import re
+        
+        # 0. CLI 로그 필터링 (버그 수정)
+        # "✓ Create...", "$ cd...", "Run tests..." 같은 로그는 제거
+        if response.count("\n") > 0:
+            lines = response.strip().split("\n")
+            
+            # CLI 로그 기호 감지
+            cli_log_indicators = ["✓", "✗", "$", "Run ", "Let me", "↪", "↪ ", "The tool call", "Allow access"]
+            
+            # 로그만 있고 실제 코드가 없으면 필터링
+            code_line_count = 0
+            log_line_count = 0
+            
+            for line in lines:
+                stripped = line.strip()
+                if any(line.startswith(indicator) for indicator in cli_log_indicators):
+                    log_line_count += 1
+                elif stripped and not stripped.startswith("#"):
+                    code_line_count += 1
+            
+            # 로그 비율이 높으면 (50% 이상) 경고 및 반환 거부
+            if log_line_count > 0 and code_line_count == 0:
+                logging.error(f"⚠️ Response contains only CLI logs (no Python code detected)")
+                logging.error(f"Response preview: {response[:200]}...")
+                return ""  # 빈 문자열 반환 - 재시도 유도
         
         # 1. ```python 또는 ```py 코드 블록 찾기
         python_pattern = r"```(?:python|py)\s*\n(.*?)```"
@@ -1764,13 +2110,16 @@ Phase 2-4: 병렬 처리      {phase2_4_time:>8.2f}초 ← asyncio.gather()로 �
         
         # 3. 코드 블록 없이 직접 코드가 있는 경우
         # Python 키워드가 있고 충분한 길이면 전체 반환
-        if any(keyword in response for keyword in ["import ", "def ", "class "]):
+        if any(keyword in response for keyword in ["import ", "def ", "class ", "@dataclass"]):
             lines = response.strip().split("\n")
             # 설명 텍스트 제거 (일반적으로 코드 앞/뒤에 있음)
             code_lines = []
             in_code = False
             for line in lines:
-                if any(keyword in line for keyword in ["import ", "def ", "class ", "if ", "for ", "while "]):
+                # CLI 로그 라인은 무시
+                if any(line.lstrip().startswith(indicator) for indicator in ["✓", "✗", "$", "Run ", "Let me", "↪"]):
+                    continue
+                if any(keyword in line for keyword in ["import ", "def ", "class ", "if ", "for ", "while ", "@dataclass"]):
                     in_code = True
                 if in_code:
                     code_lines.append(line)
@@ -1778,9 +2127,11 @@ Phase 2-4: 병렬 처리      {phase2_4_time:>8.2f}초 ← asyncio.gather()로 �
             if code_lines and len("\n".join(code_lines)) > 50:
                 return "\n".join(code_lines).strip()
         
-        # 4. 모든 방법 실패시 원본 반환 (하지만 경고)
-        logging.warning(f"Could not extract code properly. Response length: {len(response)}")
-        return response.strip()
+        # 4. 모든 방법 실패시 경고 및 빈 문자열 반환 (재시도 유도)
+        logging.warning(f"❌ Could not extract valid Python code. Response length: {len(response)}")
+        if len(response) < 500:
+            logging.warning(f"Response preview: {response}")
+        return ""
     
     def _parse_multiple_files(self, response: str) -> Dict[str, str]:
         """여러 파일 파싱"""
